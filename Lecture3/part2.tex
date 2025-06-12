@@ -1,0 +1,95 @@
+\section{基本结构}
+
+\begin{lstlisting}[style=sqlstyle]
+SELECT A1,A2,...,An
+FROM r1,r2,...,rm
+WHERE P    
+\end{lstlisting}
+
+$A_i$:属性;$r_i$:关系;$P$:谓词
+
+等价于：$\Pi_{A_1,A_2,...,A_n}(\sigma_P(r_1\times r_2\times ...\times r_m))$
+
+注意：SQL不允许在名称中使用-字符，因此在实际实现中使用branch\_name而不是branch-name.
+
+注意：SQL名称不区分大小写，即可以使用大写或小写字母。
+
+SQL允许关系和查询结果中存在重复项。
+
+要强制消除重复项，请在选择后插入关键字distinct.
+\begin{lstlisting}[style=sqlstyle]
+SELECT distinct branch_name
+FROM loan    
+\end{lstlisting}
+
+对立关键字all允许重复.
+\begin{lstlisting}[style=sqlstyle]
+ SELECT all branch_name
+ FROM loan   
+\end{lstlisting}
+
+默认情况下，允许重复，即all是默认值。
+
+选择子句中的*表示所有属性
+\begin{lstlisting}[style=sqlstyle]
+SELECT * FROM loan    
+\end{lstlisting}
+
+然而，选择子句可以包含涉及运算+,-,*和/的算术表达式，以及对常量或元组属性的操作：
+\begin{lstlisting}[style=sqlstyle]
+SELECT loan_number, branch_name, amount * 100
+FROM loan    
+\end{lstlisting}
+
+WHERE子句指定结果必须满足的条件。
+
+在WHERE子句中，可以使用逻辑连接词包括AND、OR和NOT来组合比较结果，同时可以使用BETWEEN比较运算符
+来指定范围。
+\begin{lstlisting}[style=sqlstyle]
+SELECT loan_number
+FROM loan
+WHERE amount BETWEEN 90000 AND 100000    
+\end{lstlisting}
+
+FROM子句列出了查询中涉及的关系，如果在FROM子句中指定了多个关系，则对应于关系代数的笛卡尔积操作。
+
+SQL允许使用as子句重命名关系和属性：old\_name as new\_name
+
+元组变量通过使用as子句在FROM子句中定义。
+
+SQL包含一个用于字符字符串比较的字符串匹配操作符。模式使用以下两个特殊字符描述：
+\begin{itemize}
+    \item \%：匹配任何子字符串（类似于文件系统中的*）
+    \item \_：匹配任何字符（类似于文件系统中的?）
+\end{itemize}
+
+注意：可以实现模糊匹配（放置WHERE子句，并且必须与LIKE操作一起使用）
+\begin{lstlisting}[style=sqlstyle]
+SELECT customer_name
+FROM customer
+WHERE customer_name LIKE '%Ze%'    
+\end{lstlisting}
+
+我们可以指定desc表示降序，asc表示升序，对于每个属性，升序是默认值。
+\begin{lstlisting}[style=sqlstyle]
+SELECT * FROM customer
+ORDER BY customer_city,customer_street desc, customer_name    
+\end{lstlisting}
+
+一些关系代数运算符的多重集版本支持重复。
+
+给定多重集关系$r_1$和$r_2$:
+\begin{itemize}
+    \item $\sigma_\theta(r_1)$:如果在$r_1$中有$c_1$个元组$t_1$的副本，并且$t_1$满足选择$\sigma_\theta$，则在$\sigma_\theta(r_1)$中有$c_1$个$\sigma_\theta(t_1)$的副本 
+    \item $\Pi_A(r_1)$:同理
+    \item $r_1\times r_2$:同理
+\end{itemize}
+
+SQL重复语义:
+\begin{lstlisting}[style=sqlstyle]
+SELECT A1,A2,...,An 
+FROM r1,r2,...,rm 
+WHERE P    
+\end{lstlisting}
+
+等价于$\Pi_{A_1,A_2,...,A_n}(\sigma_P(r_1\times r_2\times \dots\times r_m))$

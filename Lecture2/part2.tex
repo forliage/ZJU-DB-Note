@@ -1,0 +1,210 @@
+\section{基本关系代数操作}
+
+六个基本运算符：select,project,union,set difference, cartesian product, rename
+
+操作符接受一个或两个关系作为输入，并返回一个新的关系作为结果。
+
+\subsection{选择操作关系示例}
+
+Relation 
+
+\[
+r=\begin{array}{|c|c|c|c|}
+    \hline
+    \mathrm{A} & \mathrm{B} & \mathrm{C} & \mathrm{D}\\ \hline
+    \alpha & \alpha & 1 & 7 \\ \hline
+    \alpha & \beta & 5 & 7 \\ \hline
+    \beta & \beta & 12 & 3\\ \hline
+    \beta & \beta & 23 & 10\\ \hline
+\end{array}
+\]
+
+则
+
+\[
+\sigma_{\mathrm{A}=\beta \land \mathrm{D}_{>5}}(r)
+=
+\begin{array}{|c|c|c|c|}
+  \hline
+  \mathrm{A} & \mathrm{B} & \mathrm{C} & \mathrm{D} \\\hline
+  \beta       & \beta       & 23          & 10          \\\hline
+\end{array}
+\]
+
+请注意，在进行选择操作时，选择条件需要针对同一元组的属性值。
+
+\subsection{选择操作形式化}
+
+符号：$\sigma_p(r)$
+
+$p$被称为选择谓词
+
+定义为：$\sigma_p(r)=\{t\in r\quad \text{and}\quad p(t)\}$
+其中$p$是一个由$\land,\lor,\lnot$连接的命题演算中的公式。
+
+每个项是以下之一：<attribute>op<attribute>or<constant>
+其中op是以下之一：$=,\neq,>,\geq,<,\leq$
+
+\subsection{投影操作示例}
+
+\[
+r=\begin{array}{|c|c|c|}
+    \hline
+    \mathrm{A} & \mathrm{B} & \mathrm{C} \\ \hline
+    \alpha & 10 & 1 \\ \hline
+    \alpha & 20 & 1 \\ \hline
+    \beta & 30 & 1 \\ \hline
+    \beta & 40 & 2 \\ \hline
+\end{array}
+\]
+
+\[
+\Pi_{A,C}(r)=\begin{array}{|c|c|}
+ \hline
+ \mathrm{A} & \mathrm{C} \\ \hline
+ \alpha & 1\\ \hline
+ \alpha & 1 \\ \hline
+ \beta & 1 \\ \hline
+ \beta & 2\\ \hline   
+\end{array}\Longrightarrow 
+\begin{array}{|c|c|}
+    \hline
+    \mathrm{A} & \mathrm{C} \\ \hline
+    \alpha & 1\\ \hline
+    \beta & 1\\ \hline
+    \beta & 2\\ \hline
+\end{array}
+\]
+
+\subsection{投影操作规范化}
+
+符号：$\Pi_{A_1,A_2,...,A_k}(r)$。其中$A_1,...,A_k$是属性名称，$r$是关系名称。
+
+结果定义为通过删除未列出的列而获得的$k$列的关系。
+
+从结果中删除重复行，因为关系是集合。
+
+\subsection{并集操作示例}
+
+\[
+r = \begin{array}{|c|c|}
+    \hline
+    \mathrm{A} & \mathrm{B} \\ \hline
+    \alpha & 1\\ \hline
+    \alpha & 2\\ \hline
+    \beta & 1\\ \hline
+\end{array}
+\quad 
+s = \begin{array}{|c|c|}
+    \hline
+    \mathrm{A} & \mathrm{B} \\ \hline
+    \alpha & 2\\ \hline
+    \beta & 3 \\ \hline
+\end{array}
+\]
+
+\[
+r\cup s = \begin{array}{|c|c|}
+    \hline
+    \mathrm{A} & \mathrm{B} \\ \hline
+    \alpha & 1 \\ \hline
+    \alpha & 2 \\ \hline
+    \beta & 1 \\ \hline
+    \beta & 3 \\ \hline
+\end{array}
+\]
+
+\subsection{并集操作形式化}
+
+符号：$r\cup s$
+
+定义为：$r\cup s= \{t|t\in r\quad \text{or} \quad t\in s\}$
+
+为了使$r\cup s$有效：$r$和$s$必须具有相同的元数（即，相同的数量的属性）；属性域必须兼容。
+
+\subsection{差集运算示例}
+
+\[
+r=\begin{array}{|c|c|}
+    \hline
+    \mathrm{A} & \mathrm{B} \\ \hline
+    \alpha & 1 \\ \hline
+    \alpha & 2 \\ \hline
+    \beta & 1\\ \hline
+\end{array}
+\quad
+s=\begin{array}{|c|c|}
+    \hline
+    \mathrm{A} & \mathrm{B} \\ \hline
+    \alpha & 2\\ \hline
+    \beta & 3\\ \hline
+\end{array}
+\]
+
+\[
+r-s=\begin{array}{|c|c|}
+    \hline
+    \mathrm{A} & \mathrm{B}\\ \hline
+    \alpha & 1\\ \hline
+    \beta & 1 \\ \hline
+\end{array}
+\]
+
+\subsection{差集运算形式化}
+
+表示法：$r-s$
+
+定义为：$r-s=\{t|t\in r\quad \text{and}\quad t\notin s\}$
+
+差集必须在兼容关系之家进行：$r$和$s$必须具有相同的元数，$r$和$s$的属性域必须兼容。
+
+\subsection{笛卡尔积操作示例}
+
+\[
+r=\begin{array}{|c|c|}
+    \hline
+    \mathrm{A} & \mathrm{B} \\ \hline
+    \alpha & 1 \\ \hline
+    \beta & 2 \\ \hline
+\end{array}
+\quad
+s=\begin{array}{|c|c|c|}
+    \hline
+    \mathrm{C} & \mathrm{D} & \mathrm{E} \\ \hline
+    \alpha & 10 & a\\ \hline
+    \beta & 10 & a\\ \hline
+    \beta & 20 & b\\ \hline
+    \gamma & 10 & b\\ \hline
+\end{array}
+\]
+
+\[
+r\times s = \begin{array}{|c|c|c|c|c|}
+    \hline
+    \mathrm{A} & \mathrm{B} & \mathrm{C} & \mathrm{D} & \mathrm{E} \\ \hline
+    \alpha & 1 & \alpha & 10 & a \\ \hline
+    \alpha & 1 & \beta & 10 & a \\ \hline
+    \alpha & 1 & \beta & 20 & b\\ \hline
+    \alpha & 1 & \gamma & 10 & b\\ \hline
+    \beta & 2 & \alpha & 10 & a\\ \hline
+    \beta & 2 & \beta & 10 & a \\ \hline
+    \beta & 2 & \beta & 20 & b\\ \hline
+    \beta & 2 & \gamma & 10 & b\\ \hline
+\end{array}
+\]
+
+\subsection{笛卡尔积操作形式化}
+
+表示法：$r\times s$
+
+定义为：$r\times s = \{(t,q)|t\in r\quad \text{and}q\in s \}$
+
+假设$r(R)$和$s(S)$是属性是互不相交的（即$R\cap S=\phi$）。如果$r(R)$和$s(S)$的属性不是互不相交的，则必须对属性进行重命名。
+
+\subsection{重命名操作}
+
+允许我们为关系代数表达式的结果命名，从而引用它们（过程性）。
+
+允许我们用多个名称引用一个关系。例如，$\rho_x(E)$在名称$X$下返回表达式$E$。
+如果关系代数表达式$E$的元数为$n$，则$\rho_{X(A_1,A_2,...,A_n)}(E)$(对关系$E$及其属性进行重命名)
+返回表达式的结果$E$

@@ -1,0 +1,18 @@
+\babel@toc {english}{}\relax 
+\contentsline {section}{\numberline {1}引言}{2}{section.1}%
+\contentsline {section}{\numberline {2}关系表达式的转换}{2}{section.2}%
+\contentsline {subsection}{\numberline {2.1}关系表达式的转换}{2}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}等价规则}{3}{subsection.2.2}%
+\contentsline {subsection}{\numberline {2.3}等效表达式的枚举}{4}{subsection.2.3}%
+\contentsline {section}{\numberline {3}用于成本估算的统计信息}{5}{section.3}%
+\contentsline {subsection}{\numberline {3.1}成本估算的统计信息}{5}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}选择大小估计}{5}{subsection.3.2}%
+\contentsline {subsection}{\numberline {3.3}复杂选择的规模估计}{6}{subsection.3.3}%
+\contentsline {subsection}{\numberline {3.4}连接大小的估计}{6}{subsection.3.4}%
+\contentsline {subsection}{\numberline {3.5}不同值估计}{6}{subsection.3.5}%
+\contentsline {subsubsection}{\numberline {3.5.1}对选择后不同值数的估计}{6}{subsubsection.3.5.1}%
+\contentsline {subsubsection}{\numberline {3.5.2}对连接后不同值数的估计}{7}{subsubsection.3.5.2}%
+\contentsline {subsubsection}{\numberline {3.5.3}对投影与分组/聚合后不同值数的估计}{7}{subsubsection.3.5.3}%
+\contentsline {subsection}{\numberline {3.6}评估计划的选择}{8}{subsection.3.6}%
+\contentsline {subsection}{\numberline {3.7}基于成本的优化}{8}{subsection.3.7}%
+\contentsfinish 

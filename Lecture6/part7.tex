@@ -1,0 +1,134 @@
+\section{多值依赖（Multivalued Dependencies）}
+
+\subsection{概述}
+
+\begin{itemize}
+    \item 即使在 BCNF 中，有些数据库模式仍然不够规范化。
+    \item 示例数据库：\texttt{classes(course, teacher, book)}，其中 $(c, t, b) \in$ classes 表示 $t$ 教授课程 $c$，$b$ 是 $c$ 课程所需教材。
+    \item 每门课程 $course$ 对应一组教师 $teacher$（$1:n$）以及一组教材 $book$（$1:n$），教师和教材是独立的多值属性。
+    \item \textbf{多值属性}之间相互独立，应该避免交叉组合造成冗余。
+\end{itemize}
+
+\subsection{示例数据}
+
+\begin{center}
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{course} & \textbf{teacher} & \textbf{book} \\
+\hline
+database & Avi & DB Concepts \\
+database & Avi & DB system (Ullman) \\
+database & Hank & DB Concepts \\
+database & Hank & DB system (Ullman) \\
+database & Sudarshan & DB Concepts \\
+database & Sudarshan & DB system (Ullman) \\
+operating systems & Avi & OS Concepts \\
+operating systems & Avi & OS system (Shaw) \\
+operating systems & Jim & OS Concepts \\
+operating systems & Jim & OS system (Shaw) \\
+\hline
+\end{tabular}
+\end{center}
+
+\begin{itemize}
+    \item 目前 \texttt{classes} 关系中只有 trivial FDs，因此该关系在 BCNF 中。
+    \item 但存在 \textbf{冗余}和 \textbf{插入异常}，例如添加新的教师，需要插入 $course$ 和每本 $book$ 的组合。
+\end{itemize}
+
+\subsection{关系分解}
+
+\begin{itemize}
+    \item 为避免冗余，推荐将 \texttt{classes} 分解为两个关系：
+\end{itemize}
+
+\begin{minipage}{0.45\linewidth}
+\centering
+\textbf{teaches}
+\begin{tabular}{|l|l|}
+\hline
+\textbf{course} & \textbf{teacher} \\
+\hline
+database & Avi \\
+database & Hank \\
+database & Sudarshan \\
+operating systems & Avi \\
+operating systems & Jim \\
+\hline
+\end{tabular}
+\end{minipage}
+\hfill
+\begin{minipage}{0.45\linewidth}
+\centering
+\textbf{text}
+\begin{tabular}{|l|l|}
+\hline
+\textbf{course} & \textbf{book} \\
+\hline
+database & DB Concepts \\
+database & DB system (Ullman) \\
+operating systems & OS Concepts \\
+operating systems & OS system (Shaw) \\
+\hline
+\end{tabular}
+\end{minipage}
+
+\begin{itemize}
+    \item 这样可以保证两个关系分别满足 Fourth Normal Form (4NF)。
+\end{itemize}
+
+\subsection{多值依赖的定义}
+
+\begin{itemize}
+    \item 设 $R$ 是关系模式，$\alpha, \beta \subseteq R$，若对 $R$ 的任意关系 $r$，所有满足 $t_1[\alpha] = t_2[\alpha]$ 的元组对 $t_1,t_2$，存在 $t_3,t_4$ 满足以下条件：
+    \begin{align*}
+        t_3[\alpha] &= t_4[\alpha] = t_1[\alpha] = t_2[\alpha] \\
+        t_3[\beta] &= t_1[\beta],\quad t_4[\beta] = t_2[\beta] \\
+        t_3[R-\alpha-\beta] &= t_2[R-\alpha-\beta] \\
+        t_4[R-\alpha-\beta] &= t_1[R-\alpha-\beta]
+    \end{align*}
+    \item 记作 $\alpha \twoheadrightarrow \beta$，即 $\alpha$ 多值决定 $\beta$。
+    \item 若 $\beta \subseteq \alpha$ 或 $\alpha \cup \beta = R$，则 $\alpha \twoheadrightarrow \beta$ 是平凡的。
+\end{itemize}
+
+\subsection{多值依赖的理论性质}
+
+\begin{itemize}
+    \item \textbf{推导规则}：
+    \begin{itemize}
+        \item 若 $\alpha \rightarrow \beta$，则 $\alpha \twoheadrightarrow \beta$（即函数依赖是特殊的多值依赖）。
+    \end{itemize}
+    \item 闭包 $D^+$ 是由所有逻辑推导出的 \textbf{函数依赖} 和 \textbf{多值依赖} 的集合。
+    \item 对于简单的多值依赖，可以直接用定义推理。对于复杂依赖，需借助形式推导系统。
+\end{itemize}
+
+\subsection{补充示例}
+
+\begin{center}
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Employee-name} & \textbf{project} & \textbf{dependent} \\
+\hline
+smith & p1 & tom \\
+smith & p2 & anna \\
+smith & p1 & anna \\
+smith & p2 & tom \\
+julia & p3 & tom \\
+julia & p3 & mary \\
+julia & p1 & tom \\
+julia & p1 & mary \\
+\hline
+\end{tabular}
+\end{center}
+
+\begin{itemize}
+    \item Key = \{employee-name, project, dependent\}。
+    \item \textbf{多值依赖}的典型场景：employee 对 project 和 dependent 各自具有独立的多值依赖关系。
+\end{itemize}
+
+\subsection{总结}
+
+\begin{itemize}
+    \item 多值依赖揭示了 BCNF 中可能未充分规范化的场景。
+    \item 通过分解，减少冗余和插入/删除异常。
+    \item 目标是使关系满足 Fourth Normal Form (4NF)。
+\end{itemize}

@@ -1,0 +1,57 @@
+\section{第一范式}
+
+\subsection{第一范式概念}
+
+定义：如果一个relation中所有属性的domain都是atomic的，则该关系属于第一范式(1NF);
+
+什么是atomic：如果一个域中的元素被认为是不可再分的单元，这个域是atomic。
+
+非原子域的例子：
+\begin{itemize}
+    \item 复合属性，例如name的属性是name set
+    \item 多值属性，例子一个人的多个pjone
+    \item 复杂数据类型，面向对象中复杂的对象
+\end{itemize}
+
+关系数据库要求：所有关系必须复合1NF，即不能直接存储非原子值。
+
+\subsection{如何处理非原子值}
+
+处理复合属性：
+\begin{itemize}
+    \item 使用多个属性来表示复合属性中的各组成部分
+    \item 例如name $\to$ first name, last-name
+\end{itemize}
+
+处理多值属性：
+\begin{itemize}
+    \item 多字段：person(pname,phone1,phone2,phone3,...) 缺点：字段数目不定，扩展困难。
+    \item 单独表：(推荐)phone(pname, phone)每个phone值对应一行，结构灵活、可扩展。
+    \item 单字段：person(pname, phones)将多个值拼接到一个字段中，不推荐，违反原子性，难以查询。
+\end{itemize}
+
+最合理做法是单独建表来处理多值属性(符合1NF，保持数据库设计规范)
+
+\subsection{非原子策略的缺点}
+
+如果没有正确处理非原子值，会导致以下问题：
+\begin{itemize}
+    \item 存储复杂：数据结构不一致，难以维护。
+    \item 鼓励冗余存储：多字段/拼接字段容易产生冗余。
+    \item 查询复杂：SQL 查询变复杂，降低性能。
+\end{itemize}
+
+因此，设计中应尽量避免非原子值，确保符合 1NF。
+
+\subsection{原子性是使用方式决定的}
+
+关键观点：原子性不仅是数据的本质，还取决于 使用方式。
+
+示例：
+\begin{itemize}
+    \item Strings通常被视为不可分
+    \item 但如果学号CS0012/EE1127被拆解前两位判断部门$\to$实际上这个字段就不是原子字段了
+    \item 这种处理方式会导致在应用程序中编码信息，而不是在数据库中建模，这是不好的设计习惯
+\end{itemize}
+
+原因：数据库设计应清晰建模每个语义单元，不要把编码逻辑混入数据字段，避免隐式依赖，提升可维护性。

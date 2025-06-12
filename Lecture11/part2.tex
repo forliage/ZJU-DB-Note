@@ -1,0 +1,97 @@
+\section{关系表达式的转换}
+
+\subsection{关系表达式的转换}
+
+如果两个关系代数表达式在每个合法的数据库实例上生成相同的元组集，则称这个两个表达式是等价的。
+\begin{itemize}
+    \item 注意：元组的顺序无关紧要
+    \item 我们不关心它们在违反完整性约束的数据库上是否产生不同的结果
+\end{itemize}
+
+在SQL中，输入和输出是元组的多重集：
+如果关系代数多重集版本中的两个表达式在每个合法的数据库实例上生成相同的元组多重集，
+则称这两个表达式是等价的。
+
+等价规则表明，两种形式的等价的等价的。可以用第二种形式的表达式替换第一种形式的表达式，反之亦然。
+
+\subsection{等价规则}
+
+\noindent 1.合取（并且）谓词的拆分
+$$\sigma_{\theta_1 \land \theta_2}(E)=\sigma_{\theta_1}(\sigma_{\theta_2}(E))$$
+
+\noindent 2.选择运算的交换性（Commutativity）
+$$\sigma_{\theta_1}(\sigma_{\theta_2}(E))=\sigma_{\theta_2}(\sigma_{\theta_1}(E))$$
+
+\noindent 3.多重投影只保留最外层
+$$\pi_{L_1}(\pi_{L_2}(...(\pi_{L_n}(E))...))=\pi_{L_1}(E)$$
+
+\noindent 4.选择与笛卡尔积/Theta-Join的结合
+
+\begin{itemize}
+    \item[a] $$\sigma_{\theta}(E_1\times E_2)=E_1 \Join_{\theta}E_2$$
+    \item[b] $$\sigma_{\theta_1}(E_1\Join_{\theta_2} E_2)=E_1 \Join_{\theta_1 \land \theta_2}E_2$$
+\end{itemize}
+
+\noindent 5.Theta-Join和自然连接的交换性
+$$E_1\Join_{\theta}E_2=E_2\Join_{\theta}E_1$$
+
+\noindent 6.连接的结合性
+\begin{itemize}
+    \item[a] 自然连接的结合性 $$(E_1\Join E_2)\Join E_3=E_1\Join(E_2\Join E_3)$$
+    \item[b] Theta-Join的结合性 $$(E_1\Join_{\theta_1}E_2)\Join_{\theta_2}E_3=E_1\Join_{\theta_1\land \theta_3}(E_2\Join_{\theta_2}E_3)$$ 其中$\theta_2$只涉及$E_2$和$E_3$的属性，$\theta_1$只涉及$E_1$与$E_2$，$\theta_3$只涉及$E_1$与$E_3$。
+\end{itemize}
+
+\noindent 7.选择对Theta-Join的分配律
+\begin{itemize}
+    \item[a] 当谓词$\theta_0$只涉及$E_1$中的属性时：$$\sigma_{\theta_0}(E_1\Join_{\theta}E_2)=(\sigma_{\theta_0}(E_1))\Join_{\theta}E_2$$
+    \item[b] 当谓词$\theta_1$只涉及$E_1$的属性，$\theta_2$只涉及$E_2$的属性时：$$\sigma_{\theta_1\land \theta_2}(E_1\Join_{\theta}E_2)=(\sigma_{\theta_1}(E_1))\Join_{\theta}(\sigma_{\theta_2}(E_2))$$ 通常也记为“先对各自表Select，再做Join”。
+\end{itemize}
+
+\noindent 8.投影对Theta-Join的分配律 
+\begin{itemize}
+    \item[a] 若连接条件$\theta$只涉及属性集合$L_1\cup L_2$，$$\pi_{L_1\cup L_2}(E_1\Join_{\theta}E_2)=(\pi_{L_1}(E_1))\Join_{\theta}(\pi_{L_2}(E_2))$$
+    \item[b] 更一般地，若要在两个关系$E_1\Join_{\theta}E_2$之后做投影到属性$L$，令
+        \begin{itemize}
+            \item $L_1\subset E_1$中最终要投影的属性
+            \item $L_2\subset E_2$中最终要投影的属性
+            \item $L_3\subset E_1$中仅在连接条件$\theta$中出现但不在$L_1\cup L_2$的属性集
+            \item $L_4\subset E_2$中仅在连接条件$\theta$中出现但不在$L_1\cup L_2$的属性集
+        \end{itemize}
+        则：$$\pi_{L_1\cup L_2}(E_1\Join_{\theta}E_2)=\pi_{L_1\cup L_2}\left((\pi_{L_1\cup L_3}(E_1))\Join_{\theta}(\pi_{L_2\cup L_4}(E_2))\right)$$
+        这意味着：先对每一侧保留在投影或连接条件中所需的属性，再做Join，最后再投影。
+\end{itemize}
+
+\noindent 9.集合运算的交换性
+$$E_1\cup E_2=E_2\cup E_1, E_1\cap E_2=E_2\cap E_1$$ （注意：集合差$E_1-E_2\neq E_2-E_1$，无交换性）
+
+\noindent 10.并与交的结合性
+$$(E_1\cup E_2)\cup E_3=E_1\cup (E_2\cup E_3),(E_1\cap E_2)\cap E_3=E_1\cap (E_1\cap E_3)$$
+
+\noindent 11.选择对集合运算的分配律
+\begin{itemize}
+    \item 对差运算：$$\sigma_{\theta}(E_1-E_2)=\sigma_{\theta}(E_1)-\sigma_{\theta}(E_2)$$同样对并、交也成立。
+    \item 注意特殊式：$$\sigma_{\theta}(E_1-E_2)=\sigma_{\theta}(E_1)-E_2$$ 当$\theta$只与$E_1$相关时可写成这样，但不能把选择条件推进到右侧的$E_2$。
+\end{itemize}
+
+\noindent 12.投影对并运算的分配律
+$$\pi_L(E_1\cup E_2)=\pi_L(E_1)\cup \pi_L(E_2)$$
+
+\subsection{等效表达式的枚举}
+
+查询优化器使用等价规则系统地生成与给定表达式等效的表达式。
+
+可以按如下方式生成所有等效表达式：
+\begin{itemize}
+    \item 重复
+       \begin{itemize}
+          \item 对到目前为止找到的每个等效表达式的每个等效表达式的每个子表达式应用所有适用的等价规则
+          \item 将新生成的表达式添加到等效表达式集合中
+       \end{itemize}
+    \item 直到上述过程不再生成新的等效表达式
+\end{itemize}
+
+上述方法在空间和时间上的开销都非常大
+\begin{itemize}
+    \item 基于转换规则的优化计划生成
+    \item 仅含选择、投影和连接操作的查询的特殊处理方法
+\end{itemize}

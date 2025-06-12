@@ -1,0 +1,176 @@
+\section{用于成本估算的统计信息}
+
+\subsection{成本估算的统计信息}
+\begin{itemize}
+    \item $n_r$:关系$r$中的元组数量
+    \item $b_r$:包含$r$元组的块数量
+    \item $l_r$:$r$的元组大小
+    \item $f_r$:$r$的块因子，即一个块中能容纳的$r$元组数量
+    \item $V(A,r)$:属性$A$在$r$中出现的不同值的数量；与$\prod_{A}(r)$的大小相同
+    \item 如果$r$的元组在文件中物理上存储在一起，那么：$b_r=\lceil \frac{n_r}{f_r} \rceil$
+\end{itemize}
+
+\subsection{选择大小估计}
+
+\noindent $\sigma_{A=v}(r)$:
+\begin{itemize}
+    \item $n_r/V(A,r)$:将满足选择条件的记录数量
+    \item 键属性上的相等条件：大小估计=1
+\end{itemize}
+
+\noindent $\sigma_{A\leq V}(r)$（$\sigma_{A\geq V}(r)$的情况是对称的）
+\begin{itemize}
+    \item 设$c$表示满足该条件的元组的估计数量
+    \item 如果$\min(A,r)$和$\max(A,r)$在目录中可用：若$v<\min(A,r)$，则$c=0$；否则$c=n_r\times \frac{v-\min(A,r)}{\max(A,r)-\min(A,r)}$
+    \item 如果有直方图可用，则可以完善上述估计
+    \item 在缺乏统计信息的情况下，假定$c=\frac{n_r}{2}$
+\end{itemize}
+
+\subsection{复杂选择的规模估计}
+
+\begin{itemize}
+    \item 条件$\theta_i$的选择性是关系$r$中的一个元组满足$\theta_i$的概率：如果$s_i$是$r$中满足条件的元组数量，那么$\theta_i$的选择性由$s_i/n_r$给出。
+    \item 合取$\sigma_{\theta_1\land\theta_2\land...\land\theta_n}(r)$。假设相互独立，对结果中的元组估计为$n_r\times \frac{s_1*s_2*...*s_n}{n_r^n}$
+    \item 析取$\sigma_{\theta_1\lor\theta_2\lor...\lor\theta_n}(r)$。估计的元组数量：$n_r*\left(1-(1-\frac{s_1}{n_r})*(1-\frac{s_2}{n_r})*...(1-\frac{s_n}{n_r})\right)$
+    \item 否定$\sigma_{\lnot \theta}(r)$。估计的元组数量：$n_r-size(\sigma_{\theta}(r))$
+\end{itemize}
+
+\subsection{连接大小的估计}
+
+\begin{itemize}
+    \item 笛卡尔积$r\times s$包含$n_r * n_s$个元组；每个元组占用$s_r+s_s$字节
+    \item 如果$R\cap S=\phi$，那么$r\times s$和$s\times r$相同
+    \item 如果$R\cap S$是$R$的键，那么$S$的一个元组最多与$r$中的一个元组进行连接。因此，$r\times s$中的元组数量不超过$s$中的元组数量 
+    \item 如果$S$中的$R\cap S$是$S$中引用$R$的外键，那么$r\Join s$中的元组数量与$S$中的元组数量完全相同：$R\cap S$作为S的外键是情况是对称的
+\end{itemize}
+
+如果$R\cap S=\{A\}$不是$R$或$S$的键。如果我们假设$R$中的灭个元组$t$都会在$R\Join S$中生成元组，那么$R\times S$中的元组数量估计为：$\frac{n_r*n_s}{V(A,s)}$
+如果反之成立，则得到的估计值将为：$\frac{n_r*n_s}{V(A,r)}$这两个估计值中较小的那个可能更准确。
+
+\subsection{不同值估计}
+
+\subsubsection{对选择后不同值数的估计}
+设有关系 $r$，其属性 $A$ 在 $r$ 中的不同值数量为 $V(A,\,r)$，且关系 $r$ 的元组总数为 $\lvert r\rvert$。对选择操作 $\sigma_{\theta}(r)$，若谓词 $\theta$ 只涉及属性 $A$，则常用以下几种估计方法：
+\begin{enumerate}
+  \item 如果 $\theta$ 将 $A$ 强制为某个常数值，例如 $A=7$，则
+    \[
+    V\bigl(A,\;\sigma_{A=7}(r)\bigr) \;=\; 1.
+    \]
+  \item 如果 $\theta$ 强制 $A$ 在一组指定常数值中取值，例如 
+    \[
+    \theta:\;A \in \{1,\,3,\,4\},
+    \]
+    则有
+    \[
+    V\bigl(A,\;\sigma_{\,A\in\{1,3,4\}}(r)\bigr)
+    \;=\;
+    3.
+    \]
+  \item 如果 $\theta$ 是一个范围类谓词（如 $A<100$、$A \le 500$ 或 $10 \le A \le 20$），
+    假定属性 $A$ 在 $r$ 中近似均匀分布，选择率为 $s$（满足 $\theta$ 的元组数占 $\lvert r\rvert$ 的比例），则
+    \[
+    V\bigl(A,\;\sigma_{\theta}(r)\bigr)
+    \;\approx\;
+    V(A,\,r)\;\times\; s.
+    \]
+    例如，当 $r$ 中 $A$ 的值域是 $[1,\,1000]$，$\theta$ 为 $A<100$，可近似认为 $s=0.1$，于是
+    \[
+    V\bigl(A,\;\sigma_{A<100}(r)\bigr)\approx V(A,\,r)\times 0.1.
+    \]
+  \item 在其他更复杂的情况下（如 $\theta$ 同时涉及多个属性或函数表达式），难以精确估计时可采用保守估计：
+    \[
+    V\bigl(A,\;\sigma_{\theta}(r)\bigr)
+    \;\approx\;
+    \min\bigl(\,V(A,\,r),\;n_{\sigma}(r)\bigr),
+    \]
+    其中 $n_{\sigma}(r)$ 表示 $\sigma_{\theta}(r)$ 的基数估计（筛选后元组总数）。
+\end{enumerate}
+
+\subsubsection{对连接后不同值数的估计}
+设要对关系 $r$ 与 $s$ 做自然连接（或等值连接）$r \bowtie s$，连接属性集为 $\{A_1,\dots,A_k\}$，连接结果的基数估计为 $n_{\,r\bowtie s}$。如果要估计连接结果中某属性 $A$ 的不同值数 $V(A,\,r\bowtie s)$，常见估计方法如下：
+\begin{enumerate}
+  \item 若 $A$ 来自 $r$（即 $A$ 在 $s$ 中不存在），则
+    \[
+    V\bigl(A,\;r \bowtie s\bigr)
+    \;\approx\;
+    \min\bigl(\,V(A,\,r),\;n_{\,r\bowtie s}\bigr).
+    \]
+    因为连接后不可能出现比原来 $r$ 中更过的不同值，也无法超过连接结果的行数。
+  \item 若属性 $A$ 是由 $r$ 的子属性集合 $A_1$ 与 $s$ 的子属性集合 $A_2$ 组合而成，则可用经验公式
+    \[
+    V\bigl(A,\;r \bowtie s\bigr)
+    \;\approx\;
+    \min\Bigl(\,
+      V(A_1,\,r)\times V(A_2 - A_1,\,s),\;
+      V(A_1 - A_2,\,r)\times V(A_2,\,s),\;
+      n_{\,r\bowtie s}
+    \Bigr),
+    \]
+    其中
+    \begin{itemize}
+      \item $V(A_1,\,r)$：$r$ 中属性集合 $A_1$ 的不同值数；
+      \item $V(A_2,\,s)$：$s$ 中属性集合 $A_2$ 的不同值数；
+      \item $V(A_2 - A_1,\,s)$：$s$ 中仅在 $A_2$ 中且不属于 $A_1$ 的属性组合的不同值数；
+      \item $V(A_1 - A_2,\,r)$：$r$ 中仅在 $A_1$ 中且不属于 $A_2$ 的属性组合的不同值数；
+      \item $n_{\,r\bowtie s}$：连接结果的基数估计。
+    \end{itemize}
+    该公式表示连接后组合属性的不同值数不会超过“各自参与属性数量的乘积”，也不会超过连接后的行数，取三者最小。
+\end{enumerate}
+
+\subsubsection{对投影与分组/聚合后不同值数的估计}
+\begin{enumerate}
+  \item \textbf{投影操作}  
+    对关系 $r$ 做投影 $\pi_{L}(r)$，只保留属性集 $L$ 中的列。若 $A\in L$，则通常认为：
+    \[
+    V\bigl(A,\;\pi_{L}(r)\bigr)
+    \;=\; 
+    V\bigl(A,\,r\bigr),
+    \]
+    因为投影不会合并本身已不同的值。若仅保守估计，也可直接沿用 $V(A,r)$。
+
+  \item \textbf{分组 + 聚合操作}  
+    对关系 $r$ 按属性集 $G$ 分组，再对某列 $A$ 进行聚合，例如计算 $\min(A)$ 或 $\max(A)$。  
+    \begin{itemize}
+      \item 当聚合函数为 $\min(A)$ 或 $\max(A)$ 时，分组后每组会产生一个最小值或最大值。估计不同值数时，最常用经验公式是：
+        \[
+        V\bigl(\min(A),\,r\bigr)
+        \;=\;
+        \min\bigl(\,V(A,\,r),\;V(G,\,r)\bigr),
+        \qquad
+        V\bigl(\max(A),\,r\bigr)
+        \;=\;
+        \min\bigl(\,V(A,\,r),\;V(G,\,r)\bigr).
+        \]
+        其中 $V(G,\,r)$ 是分组属性集 $G$ 在 $r$ 中的不同值数。直觉上结果数不会超过分组数，也不会超过原来 $A$ 的不同值数。
+      \item 对于其他聚合函数（如 $\mathrm{SUM}(A)$、$\mathrm{AVG}(A)$、$\mathrm{COUNT}(*)$ 等），一般保守假设“每个分组都产生不同的聚合值”，于是估计：
+        \[
+        V\bigl(\text{其他聚合结果},\,r\bigr)
+        \;\approx\;
+        V\bigl(G,\,r\bigr).
+        \]
+        即聚合结果的不同值数近似等于分组属性集 $G$ 的不同值数。
+    \end{itemize}
+\end{enumerate}
+
+\subsection{评估计划的选择}
+
+选择评估计划时必须考虑评估技术的相互作用：
+为每个操作独立选择最便宜的算法可能无法产生最佳的整体算法，例如：
+\begin{itemize}
+    \item 合并连接的成本可能高于哈希连接，但可能提供排序后的输出，从而降低外层聚合的成本
+    \item 嵌套循环连接可能为流水线操作提供机会
+\end{itemize}
+
+实际的查询优化器结合了以下两种广泛方法的要素：
+\begin{itemize}
+    \item 搜索所有方案，并以基于成本的方式选择最佳方案
+    \item 使用启发式方法选择方案
+\end{itemize}
+
+\subsection{基于成本的优化}
+
+考虑为$r_1\times r_2\times ...\times r_n$找到最佳连接顺序。
+
+上述表达式有$\frac{(2(n-1))!}{(n-1)!}$种不同的连接顺序。当$n=7$时，数量为665280；当$n=10$时，数量超过1760亿。
+
+无需生成所有的连接顺序。使用动态规划，$\{r_1,r_2,...,r_n\}$的任何子集的最低成本连接顺序只需计算一次，并存储以供将来使用。

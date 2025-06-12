@@ -1,0 +1,62 @@
+\section{实体集}
+
+在数据库设计中，Entity Set是从现实世界抽象出的一类"可区分对象"的集合，是构建ER模型的基本单元。
+
+\subsection{实体和实体集}
+
+1.Entity:
+\begin{itemize}
+    \item Entity是现实世界中可被唯一识别的"物"或"事"，可以是具体的也可以是抽象的
+    \item 每个实体由一组attributes来描述，例如student entity可能有id,name,age,gender,profession等属性
+\end{itemize}
+
+2.Entity Set:
+\begin{itemize}
+    \item Entity Set是一类具有相同属性集合的entity的集合，即同一类型实体的全体。
+    \item 例如"Student"实体集包含所有学生；"Customer"实体集包含所有客户;"Loan"实体集包含所有贷款
+    \item 在关系模型中，一个实体集最终映射为一张关系(表)，实体映射为关系中的一行(元组)，属性映射为列(字段)
+\end{itemize}
+
+\subsection{属性与域}
+
+1.属性:
+\begin{itemize}
+    \item 属性是对实体某种特征或性质的描述。例如客户实体的属性包含customer-id,customer-name,customer-street,customer-city等
+    \item 实体集customer对应关系的表头(列名)就是这些属性名称
+\end{itemize}
+
+2.域(Domain):
+\begin{itemize}
+    \item 域也称"值域"或"取值集合"，指某个属性所允许的所有可能取值的集合
+    \item 例如属性customer-id的域可以是所有符合特定编码规则的字符串；属性age的域可以是整数[0,150]
+\end{itemize}
+
+\subsection{属性类型}
+
+1.简单属性 vs.复合属性
+\begin{itemize}
+    \item 简单属性：原子不可分。如sex,age
+    \item 复合属性：有多个分量属性组成，如name可以分解为first-name,middle-initial,last-name;address可分解为street,city,state,postal-code等
+\end{itemize}
+
+2.单值属性 vs. 多值属性
+\begin{itemize}
+    \item 单值属性:对每个实体只能取一个值，例如某学生只有一个学号
+    \item 多值属性:对某个实体可能取多个值，例如phone-numbers，一个客户有多个电话号码。在关系模型中多值属性要拆成单独的关联表来实现。
+\end{itemize}
+
+3.派生属性 vs. 基属性
+\begin{itemize}
+    \item 基属性:在数据库中物理存储的属性
+    \item 派生属性:可以由其它属性计算或推导出来，不必实际存储，例如age可以由birthday和当前日期计算得出。
+\end{itemize}
+
+\subsection{实体集和关系模型}
+
+在从ER模型向关系模型转换时，每个实体集会成为一张关系表；
+
+属性映射为表的列；
+
+实体映射为表中的一条记录(元组);
+
+对于多值属性或复合属性，需要额外设计关联表或将复合属性展开为多个列

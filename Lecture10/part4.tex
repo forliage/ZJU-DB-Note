@@ -1,0 +1,245 @@
+\section{连接操作}
+
+几种不同的连接实现算法：
+\begin{itemize}
+    \item 嵌套循环连接
+    \item 块嵌套循环连接
+    \item 索引嵌套循环连接
+    \item 合并连接
+    \item 哈希连接
+\end{itemize}
+
+示例使用以下信息：
+\begin{itemize}
+    \item 选课表的记录数：$n=10,000$，学生表：$n=5000$
+    \item 选课表的块数：$b=400$，学生表：$b=100$
+\end{itemize}
+
+\subsection{嵌套循环连接}
+
+为了计算$\theta$连接$r\Join_{\theta}s$
+\begin{lstlisting}[style=sqlstyle]
+for each tuple tr in r do begin
+   for each tuple ts in s de begin
+      test pair(tr, ts) to see if they satisfy the join condition theta
+      if they do, add tr*ts to the result
+    end
+end    
+\end{lstlisting}
+
+$r$称为连接的外关系，$s$称为连接的内关系。
+
+不需要索引，可用于任何类型的连接条件。
+
+开销大，因为它会检查两个关系的每一对元组。
+
+在最坏的情况下，如果内存仅够容纳每个关系的一个块，则估计成本为$n_r*b_s+b_r$ block transfers+$n_r+b_r$ seeks
+
+如果较小的关系能完全放入内存，则将其用作内关系：将成本降低至$b_r+b_s$次块传输和2次寻道
+
+假设在最坏的内存可用情况下，成本估计为：
+\begin{itemize}
+    \item 以学生表作为外关系：5000*400+100=2,000,100块传输，5000+100=5100查找
+    \item 以外层关系作为输入：10000*100+400=1,000,400块传输和10,400次查找
+\end{itemize}
+
+如果较小的关系（学生）能完全放入内存，成本估算将为500次块传输。
+
+\subsection{块嵌套循环连接}
+
+是嵌套循环连接的一种变体，其中内关系的每个块都与外关系的每个块配对。
+\begin{lstlisting}[style=sqlstyle]
+for each block Br of r de begin
+   for each block Bs of s de begin
+      for each tuple tr in Br do begin
+         for each tuple ts in Bs do begin
+            Check if (tr, ts) satisfy the join condition
+            if they do, add tr*ts to the result
+         end
+      end
+   end
+end    
+\end{lstlisting}
+
+最坏情况估计：$b_r*b_s+b_r$次块传输$+2*b_r$次寻道。外层关系中的每个块都会读取一次内层关系中的$s$块。
+
+最佳情况：$b_r+b_s$次块传输+2次寻道
+
+对嵌套循环和块嵌套循环算法的改进：
+\begin{itemize}
+    \item 在块嵌套循环中，使用$M-2$个磁盘块作为外层关系的块处理单元，其中$M=$为以块为单位的内存大小；使用剩余的两个块来缓冲内层关系和输出：成本$=\lceil  b_r/(M-2) \rceil*b_s+b_r$块传输$+2\lceil b_r/(M-2) \rceil$寻道
+    \item 如果等值连接属性构成键或内部关系，则在首此匹配时停止内循环
+    \item 交替向前和向后扫描内循环，以利用缓冲区中剩余的块（采用LRU），若可用，使用内部关系上的索引
+\end{itemize}
+
+\subsection{索引嵌套循环连接}
+如果满足以下条件，索引查找可以替代文件扫描：
+\begin{itemize}
+    \item 连接是等值连接或自然连接，并且
+    \item 内部关系的连接属性上有可用的索引---可以仅为计算连接而构建的一个索引。
+\end{itemize}
+
+对于外部关系$r$中的每个元组$t_r$，使用索引在$s$中查找与元组$t_r$满足连接条件的元组。
+
+最坏情况：缓冲区仅能容纳$r$的一个页面，并且对于$r$中的每个元组，我们都要在$s$上执行一次索引查找。
+
+连接成本：$b_r(t_T+t_S)+n_r*c$。其中$c$是遍历索引并为一个元组获取所有匹配的$s$元组的成本，或者是$r$。$c$可以估计为使用连接条件对$s$进行单次选择的成本。
+
+如果$r$和$s$的连接属性上都有索引，则使用元组较少的关系作为外部关系。
+
+\subsection{合并连接（排序归并连接）}
+
+在连接属性上对两个关系进行排序（如果尚未在连接属性上排序）。
+
+合并已排序的关系以进行连接：
+\begin{itemize}
+    \item 连接步骤类似于排序归并算法的合并阶段。
+    \item 主要区别在于处理连接属性中的重复值---连接属性上具有相同值的每一对都必须匹配
+\end{itemize}
+
+仅可用于等值连接和自然连接。
+
+每个块只需读取一次（假设连接属性的任何给定值的所有元组都能放入内存）。
+
+因此，合并连接的成本为：$b_r+b_s$块传输$+\lceil b_r/b_b \rceil+\lceil b_s/b_b \rceil$寻道（+如果关系未排序，则为排序成本）
+
+混合归并连接（混合归并连接）如果一个关系已排序，而另一个关系在连接属性上有辅助B+树索引。
+\begin{itemize}
+    \item 将已排序的关系与B+树的叶节点条目合并
+    \item 按未排序关系元组的地址对结果进行排序
+    \item 按物理地址顺序扫描未排序关系，并与之前的结果合并，用实际元组替换地址（顺序扫描比随机查找更高效）
+\end{itemize}
+
+\subsection{哈希连接}
+
+\subsubsection{Hash连接的基本思想}
+
+1.使用场景：
+
+Hash-Join 主要用于 等值连接（Equi-Join） 和 自然连接（Natural Join），也就是连接条件形式为 r.某属性 = s.某属性 的情形。
+
+2.总流程overview：
+
+假设要对关系（表）R 与 S 进行连接，且它们连接条件为相同的属性（例如 R.A = S.A）。Hash-Join 的基本思路可以分为两个阶段：
+
+\begin{itemize}
+    \item 分区阶段：
+       \begin{enumerate}
+          \item 选定一个哈希函数$h$，将$R$中每个元组tr(tuple)按$h(tr[A])$的哈希值划分到$R_0,R_1,...,R_n$共$n+1$个分区中
+          \item 同理，将$S$中每个元组ts按相同的哈希函数$h$，把ts[A]映射到$S_0,S_1,...,S_n$
+          \item 这样，所有$R$中哈希值为$i$的元组都进入同一个分区$R_i$，所有$S$中哈希值为$i$的元组都进入分区$S_i$。只需要保证：若$R$中某个元组tr和$S$中某个元组ts能够满足$tr[A]=ts[A]$，那么它们必然在同一个哈希分区$i$中。
+       \end{enumerate}
+    \item 匹配阶段：对每个分区$i=0,...,n$:
+       \begin{enumerate}
+          \item 将较小的分区---假设是$S_i$（称为"build"输入）---全部加载到内存中，并基于连接属性再建立一个内存哈希表（使用另一种哈希函数$h'$，仅对这一小块数据进行索引）
+          \item 然后对$R_i$（称为"probe"输入）中的每个元组tr，依次读取并在内存哈希表中查找所有匹配的ts。只要找到了，就输出$(tr\Join ts)$的连接结果。
+       \end{enumerate}
+\end{itemize}
+
+这样，$R_i$仅与$S_i$做内部连接运算，无需与其它$S_j(j\neq i)$分区做比较，因为哈希保证了等值连接的所有候选都落在同一分区。
+
+\subsubsection{Hash-Join的详细步骤}
+
+假设$R$有$b_r$个磁盘块，$S$有$b_s$个磁盘块。同时假设可用内存能容纳$M$个数据页
+
+\noindent 1.选择分区数$n$以及哈希函数$h$。
+
+通常，$n=\lceil b_s/M \rceil\times f$，其中$f$是调节因子，通常取1.2.这样保证每个$S_i$分区大概只有$M$个页面左右，可以一次性装入内存。
+$R_i$分区不一定要完全装入内存，但$S_i$一定要能放进内存，才能构建哈希表。
+
+\noindent 2.第一遍---分区阶段：对$S$做哈希分区
+
+\begin{lstlisting}[style=sqlstyle]
+ // Reserve a memory output buffer for each partition output_buf[i]
+ for (each tuple ts in S read) do:
+     idx = h(ts[A])
+     write ts to output_buf[idx]
+     // When output_buf[idx] is one page full, flush (write) it to the partitioned file S_idx on disk and clear the buffer
+ end for
+ // Flush all buffers that are not yet full and write the remaining tuples to the corresponding S_i file
+\end{lstlisting}
+
+\noindent 3.分区阶段：对$R$做哈希分区
+
+\begin{lstlisting}[style=sqlstyle]
+for (each tuple tr in R read) do:
+    idx = h(tr[A])
+    Write tr to output_buf[idx] of R
+    // Write to R_idx file on disk when buffer is full
+end for
+//  Flush remaining buffers to each R_i partition file   
+\end{lstlisting}
+
+\noindent 4.都每个分区$i=0,...,n$：执行Build \& probe
+\begin{lstlisting}[style=sqlstyle]
+ for i in 0...n do:
+     // 4.1  Load S_i into memory first to build the hash table
+     load the entire S_i partition into memory
+     Create in-memory hash index HSi = <value $\to$ list of records> by hashing each tuple in S_i with join attribute A
+     
+     // 4.2 Probe R_i tuple by tuple.
+     for (each tuple tr in R_i read) do
+         key = tr[A]
+         Find a list of all matching tuples for key in HSi L = HSi[key]
+         for (each ts in L) do:
+             Output connection results
+         end for
+    end for 
+
+    // 4.3 Release HSi, go to next partition i+1
+end for
+\end{lstlisting}
+
+\subsubsection{Hash-Join优缺点}
+
+\noindent 1.优点：
+
+大多数 IO 都是 顺序写+顺序读，而非随机访问，磁盘吞吐量高。
+
+只要分区合理，每个$S_i$足够小都能驻留内存，Probe 阶段查找非常快。
+
+如果 R 与 S 都是一次性顺序扫描分区，再顺序读$R_i$，磁盘寻道次数少。
+
+\noindent 2.缺点：
+
+需要一次完整地对 R、S 做哈希分区，要写出 n 个分区文件、再读回。对于大表，分区和合并会带来开销。
+
+查询 $R\Join S$ 时，要先完成所有分区并写入磁盘，再做 Build \& Probe。适合批量连接，不适合低延迟单次查询。
+
+如果哈希分区不均匀（Skew），导致某些分区$S_i$超大，会出现“分区倾斜”，或者哈希表溢出，需要额外再递归拆分。
+
+\subsubsection{处理溢出（Overflow）的策略}
+
+\noindent 1.可能原因
+
+某个哈希分区 HSi 过大，无法整体装入内存。
+
+原因可能是连接键的分布不均匀（很多元组的 key 落在同一个桶），或者哈希函数选择不当。
+
+\noindent 2.解决方案
+
+\begin{itemize}
+    \item 递归分区（Overflow Resolution）:对那个超大的分区$S_i$，再用第二个哈希函数$h_2$ 将其细分成更小的子分区。同时对对应的$R_i$也要用同一$h_2$做分区。这样便可保证“最终子分区”能够满足内存大小。
+    \item 预先避免（Overflow Avoidance）:在最外层分区时，就尽量让 n 取得更大,使得每个分区平均更小。如果预计某些 key 会非常集中，可以先对 S 做一次非常细的分区，然后再合并分区（分层合并）。
+    \item 极端场景退化:如果分区之后仍然无法保证某个构建分区在内存里，那么可以对该分区执行 块嵌套循环连接（Block Nested Loop Join），对重数据量进行笨拙但安全的直接连接。
+\end{itemize}
+
+\subsubsection{Hash-Join成本估计}
+
+设不需要递归分区（所有$S_i$都能一次性装进 M 页内存），则：
+
+\noindent\textbf{分区阶段}：
+ \begin{itemize}
+    \item 对$S$做一次顺序读和分区写$\to 2\times b_s$个块传输
+    \item 对$R$做一次顺序读和分区写$\to 2\times b_r$个块传输加上为每个分区写空缓存页的开销（约$n_h$块）
+    \item 总计：$3\times (b_r+b_s)+4\times n_h$块传输
+ \end{itemize}
+
+ \noindent\textbf{匹配阶段I/O}：
+ \begin{itemize}
+    \item 对$S_i$直到装入内存已在分区阶段完成，分区读无需额外开销；
+    \item 对每个分区$R_i$顺序读一次:$b_r$块
+    \item 每次分区查找结束后，不需要再写出连接结束到磁盘。
+    \item 再加上每读一个分区要一次磁盘寻道，共$n_h$次。
+ \end{itemize}
+

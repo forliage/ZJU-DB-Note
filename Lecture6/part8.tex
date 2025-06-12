@@ -1,0 +1,122 @@
+\section{第四范式}
+
+\subsection{第四范式（4NF）定义}
+
+一个关系模式 $R$ 关于一组函数依赖和多值依赖 $D$，若对于 $D^+$ 中所有形如 $\alpha \twoheadrightarrow \beta$ 的多值依赖，$\alpha \subseteq R, \beta \subseteq R$，满足以下至少一个条件，则称 $R$ 满足第四范式（4NF）：
+
+\begin{itemize}
+    \item $\alpha \twoheadrightarrow \beta$ 是平凡的（trivial）：
+    \begin{itemize}
+        \item $\beta \subseteq \alpha$ 或
+        \item $\alpha \cup \beta = R$
+    \end{itemize}
+    \item $\alpha$ 是关系 $R$ 的一个超码（superkey）。
+\end{itemize}
+
+\textbf{性质}：
+
+\begin{itemize}
+    \item 如果一个关系在 4NF 中，它一定在 BCNF 中。
+\end{itemize}
+
+\subsection{为什么需要4NF？}
+
+\begin{itemize}
+    \item 有些在 BCNF 中的关系模式仍存在\textbf{多值依赖}（Multivalued Dependencies, MVDs）导致的冗余和异常。
+    \item 多值依赖的典型特征是某些属性组之间的值是独立的。
+\end{itemize}
+
+\textbf{例子}：
+
+\begin{itemize}
+    \item 关系 \texttt{classes(course, teacher, book)}，对于每门课程 \texttt{course}，有一组 \texttt{teacher} 和一组 \texttt{book}，且两者相互独立：
+    \begin{itemize}
+        \item $course \twoheadrightarrow teacher$
+        \item $course \twoheadrightarrow book$
+    \end{itemize}
+\end{itemize}
+
+\textbf{问题}：
+
+\begin{itemize}
+    \item 数据冗余（Redundant）：
+    \begin{itemize}
+        \item 插入新教师需要复制教材信息。
+        \item 删除一个教师，可能导致教材信息丢失。
+    \end{itemize}
+    \item 插入/删除异常。
+\end{itemize}
+
+\subsection{4NF 分解要求}
+
+\begin{itemize}
+    \item 将关系 $R$ 分解成 $R_1, R_2, \ldots, R_n$，使每个 $R_i$ 满足 4NF。
+    \item 分解过程应保持 \textbf{Lossless Join}（无损连接）。
+\end{itemize}
+
+\textbf{对子模式 $R_i$ 应保留的依赖}：
+
+\begin{itemize}
+    \item $D_i$ 包含以下依赖：
+    \begin{itemize}
+        \item 所有只涉及 $R_i$ 属性的函数依赖。
+        \item 所有形如 $\alpha \twoheadrightarrow (\beta \cap R_i)$ 的多值依赖，且 $\alpha \subseteq R_i$。
+    \end{itemize}
+\end{itemize}
+
+\subsection{4NF 分解算法}
+
+\begin{enumerate}
+    \item 初始 $result := \{R\}$，$done := false$。
+    \item 计算 $D^+$。
+    \item 设 $D_i$ 为 $D^+$ 限制在 $R_i$ 上的依赖。
+    \item \textbf{循环}：
+    \begin{itemize}
+        \item 若 $result$ 中存在不满足 4NF 的 $R_i$，则执行以下步骤：
+        \begin{enumerate}
+            \item 取出 $R_i$ 上一个非平凡 MVD $\alpha \twoheadrightarrow \beta$。
+            \item 执行分解：
+            \[
+            result := (result - R_i) \cup (\alpha, \beta) \cup (R_i - \beta)
+            \]
+        \end{enumerate}
+    \end{itemize}
+    \item 直到所有 $R_i$ 满足 4NF。
+\end{enumerate}
+
+\textbf{保证}：分解后，每个 $R_i$ 在 4NF 中，且分解是 Lossless Join。
+
+\subsection{进一步的范式（Further Normal Forms）}
+
+\begin{itemize}
+    \item \textbf{连接依赖}（Join Dependencies, JD）推广了多值依赖。
+    \begin{itemize}
+        \item 对应 \textbf{第五范式}（5NF），也称 \textbf{投影-连接范式}（PJNF）。
+    \end{itemize}
+    \item 还有更一般的约束，称为 \textbf{域-码范式}（Domain-Key Normal Form, DKNF）。
+\end{itemize}
+
+\textbf{问题}：
+
+\begin{itemize}
+    \item DKNF 推理困难。
+    \item 没有一套可靠、完备的推理规则。
+    \item 实际应用中极少采用。
+\end{itemize}
+
+\subsection{小结}
+
+\begin{tabular}{|c|c|}
+\hline
+\textbf{范式} & \textbf{目标} \\
+\hline
+BCNF & 消除所有非平凡 FD 依赖导致的数据冗余 \\
+4NF & 消除多值依赖（MVD）导致的数据冗余 \\
+5NF (PJNF) & 消除连接依赖导致的数据冗余 \\
+\hline
+\end{tabular}
+
+\begin{itemize}
+    \item 4NF 是 BCNF 的增强。
+    \item 设计复杂数据库时若存在独立的多值属性，应考虑 4NF 分解。
+\end{itemize}

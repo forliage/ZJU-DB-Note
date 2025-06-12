@@ -1,0 +1,67 @@
+\section{弱实体集}
+
+在E-R模型中，Weak Enitity Set是一类自身没有完全主键、其存在依赖于另一个"强实体集"的实体集合。
+
+\subsection{什么是弱实体集}
+
+弱实体集是指"没有自己固有的主键"的实体集：它的每个实体不能单凭自身属性唯一标识，必须借助与某个强实体
+的关联才能区分。
+
+弱实体集通常用双实线的矩形表示，关联它的标识性联系用双菱形表示。
+
+\subsection{弱实体集的要素}
+
+1.标识实体集：弱实体集依赖的强实体集，后者必须有一个完整的主键。
+
+2.标识关系：把弱实体集和标识实体集连接起来的全参与、一对多联系:
+\begin{itemize}
+    \item 全参与：弱实体必须对应某个强实体才存在
+    \item 一对多：一个强实体可关联多个弱实体，但每个弱实体仅对应一个强实体
+\end{itemize}
+
+3.部分码/辨别符：
+\begin{itemize}
+    \item 在弱实体集中，用来区分同一标识实体下不同实体的"局部唯一属性"
+\end{itemize}
+
+4.弱实体集的主键：由标识实体集的主键加上自身的部分码共同组成。
+
+\subsection{转换到关系模式}
+
+在关系模式中，弱实体集\texttt{section}和\texttt{payment}会映射为表，但不再单独存储”标识实体的主键“，因为
+它隐含在外键列中:
+\begin{lstlisting}[style=sqlstyle]
+    CREATE TABLE course (
+      course_id   INT      PRIMARY KEY,
+      title       VARCHAR(50),
+      credits     INT
+    );
+    
+    CREATE TABLE section (
+      sec_id      INT         NOT NULL,
+      semester    CHAR(6)     NOT NULL,
+      year        INT         NOT NULL,
+      course_id   INT         NOT NULL, 
+      PRIMARY KEY (course_id, sec_id, semester, year),
+      FOREIGN KEY (course_id) REFERENCES course(course_id)
+    );
+    
+    CREATE TABLE loan (
+      loan_number VARCHAR(20) PRIMARY KEY,
+      amount      DECIMAL(10,2)
+    );
+    
+    CREATE TABLE payment (
+      payment_number INT      NOT NULL,  
+      payment_date   DATE     NOT NULL,
+      payment_amount DECIMAL(10,2),
+      loan_number    VARCHAR(20) NOT NULL,  
+      PRIMARY KEY (loan_number, payment_number),
+      FOREIGN KEY (loan_number) REFERENCES loan(loan_number)
+    );
+        
+\end{lstlisting}
+
+section 表中没有再声明单独的 course\_id 属性为主键，因为 course\_id 已包含在复合主键里。
+
+外键 (course\_id) 与标识关系相对应，确保“无主课程的节次不能存在”。

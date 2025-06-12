@@ -1,0 +1,23 @@
+\babel@toc {english}{}\relax 
+\contentsline {section}{\numberline {1}物理存储介质概述}{2}{section.1}%
+\contentsline {subsection}{\numberline {1.1}物理存储介质的分类}{2}{subsection.1.1}%
+\contentsline {subsection}{\numberline {1.2}存储层次结构}{3}{subsection.1.2}%
+\contentsline {subsection}{\numberline {1.3}物理存储介质}{4}{subsection.1.3}%
+\contentsline {section}{\numberline {2}磁盘}{5}{section.2}%
+\contentsline {subsection}{\numberline {2.1}磁盘}{5}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}磁盘子系统}{6}{subsection.2.2}%
+\contentsline {subsection}{\numberline {2.3}磁盘的性能指标}{6}{subsection.2.3}%
+\contentsline {subsection}{\numberline {2.4}磁盘块访问优化}{7}{subsection.2.4}%
+\contentsline {section}{\numberline {3}存储访问}{8}{section.3}%
+\contentsline {subsection}{\numberline {3.1}存储访问}{8}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}缓冲区管理器}{9}{subsection.3.2}%
+\contentsline {subsection}{\numberline {3.3}缓冲区替换策略}{10}{subsection.3.3}%
+\contentsline {section}{\numberline {4}文件组织}{10}{section.4}%
+\contentsline {subsection}{\numberline {4.1}文件组织}{10}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}定长记录}{11}{subsection.4.2}%
+\contentsline {subsection}{\numberline {4.3}空闲列表}{11}{subsection.4.3}%
+\contentsline {subsection}{\numberline {4.4}可变长度记录}{11}{subsection.4.4}%
+\contentsline {subsection}{\numberline {4.5}槽页结构}{12}{subsection.4.5}%
+\contentsline {subsection}{\numberline {4.6}定长表示}{12}{subsection.4.6}%
+\contentsline {subsection}{\numberline {4.7}指针方法}{12}{subsection.4.7}%
+\contentsfinish 

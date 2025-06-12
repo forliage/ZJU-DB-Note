@@ -1,0 +1,163 @@
+\section{第三范式}
+
+\subsection{引入动机}
+
+在某些情况下，BCNF 分解虽然可以消除冗余，但不能保证 \textbf{依赖保持}（Dependency Preservation）。而在实际数据库设计中，更新操作时需要高效地检查函数依赖是否被违反，若丢失依赖保持则必须进行昂贵的 JOIN 操作。
+
+\textbf{解决方案}：引入一个更弱的范式——\textbf{第三范式（3NF）}，具备以下特点：
+
+\begin{itemize}
+    \item 允许一定的冗余。
+    \item 可以在单个子关系中独立检查 FD，\textbf{保证依赖保持}。
+    \item \textbf{总是可以}进行无损连接、依赖保持的 3NF 分解。
+\end{itemize}
+
+\subsection{定义}
+
+对于关系模式 $R$，若对于 $F^+$ 中的所有函数依赖 $\alpha \to \beta$，至少满足以下任一条件，则 $R$ 满足 \textbf{3NF}：
+
+\begin{enumerate}
+    \item $\alpha \to \beta$ 是平凡依赖（$\beta \subseteq \alpha$）。
+    \item $\alpha$ 是 $R$ 的超码（superkey）。
+    \item $\beta - \alpha$ 中的每一个属性 $A$，都是 $R$ 的某个候选键中的主属性。
+\end{enumerate}
+
+\textbf{关系}：BCNF $\Rightarrow$ 3NF。3NF 是对 BCNF 的\textbf{最小放宽}，用于保证依赖保持。
+
+\subsection{示例}
+
+关系 $R = (J, K, L)$，函数依赖集 $F = \{ JK \to L, L \to K \}$。
+
+\begin{itemize}
+    \item 候选键：$JK$、$JL$。
+    \item $JK \to L$：$JK$ 是超码，满足。
+    \item $L \to K$：$K$ 是候选键中的一部分，满足。
+\end{itemize}
+
+因此，$R$ 满足 3NF。但如果分解成 BCNF，$JK \to L$ 不会被保留，导致依赖无法直接检查，需要 JOIN。
+
+\subsection{3NF 中的冗余}
+
+3NF 允许存在冗余，这正是换取依赖保持的代价。
+
+示例 $R(J,K,L)$ 中，$L \to K$ 导致 $(L,K)$ 对重复存储，甚至出现 NULL 值。
+
+\textbf{总结}：
+
+\begin{itemize}
+    \item BCNF：彻底消除冗余，但可能丢失依赖保持。
+    \item 3NF：允许一定冗余，保证依赖保持。
+\end{itemize}
+
+\subsection{3NF 检测方法}
+
+\begin{itemize}
+    \item 只需检查 $F$ 中的 FD，不需要检查 $F^+$。
+    \item 对每个 $\alpha \to \beta$：
+    \begin{itemize}
+        \item 计算 $\alpha^+$，判断 $\alpha$ 是否是超码。
+        \item 如果不是，检查 $\beta - \alpha$ 中每个属性是否为候选键中的主属性。
+    \end{itemize}
+\end{itemize}
+
+\textbf{注意}：
+
+\begin{itemize}
+    \item 需要找出所有候选键，计算候选键是 NP-hard 问题。
+\end{itemize}
+
+\subsection{3NF 分解算法}
+
+\begin{enumerate}
+    \item 对 $F$ 求出规范覆盖 $F_c$。
+    \item 对 $F_c$ 中每个 $\alpha \to \beta$，若当前已有子关系中无 $\alpha \beta$，则新建子关系 $R_i = (\alpha, \beta)$。
+    \item 最后，若当前子关系中无包含任何候选键的关系，补充一个包含候选键的子关系 $R_{key}$。
+\end{enumerate}
+
+保证：
+
+\begin{itemize}
+    \item Lossless-join。
+    \item Dependency-preserving。
+\end{itemize}
+
+\subsection{示例}
+
+关系模式：
+
+\begin{quote}
+\texttt{Banker-info-schema = (branch-name, customer-name, banker-name, office-number)}
+\end{quote}
+
+函数依赖集：
+
+\begin{quote}
+$F = \{ banker-name \to branch-name, office-number;\ customer-name,\ branch-name \to banker-name \}$
+\end{quote}
+
+候选键：
+
+\begin{quote}
+$\{ customer-name, branch-name \}$
+\end{quote}
+
+分解结果：
+
+\begin{quote}
+\texttt{Banker-office-schema = (banker-name, branch-name, office-number)}\\
+\texttt{Banker-schema = (customer-name, branch-name, banker-name)}
+\end{quote}
+
+分解后，$Banker-schema$ 包含候选键，分解结束。
+
+\subsection{3NF 与 BCNF 的比较}
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{方面} & \textbf{BCNF} & \textbf{3NF} \\
+\hline
+是否 Always Lossless-join & 是 & 是 \\
+是否 Always Dependency-preserving & 否 & 是 \\
+是否可能有冗余 & 否 & 有可能 \\
+\hline
+\end{tabular}
+\caption{BCNF 与 3NF 的比较}
+\end{table}
+
+\subsection{设计目标总结}
+
+设计目标优先级：
+
+\begin{itemize}
+    \item BCNF。
+    \item Lossless join。
+    \item Dependency preservation。
+\end{itemize}
+
+如果不能全部达成，通常选择：
+
+\begin{itemize}
+    \item 接受 3NF（允许冗余，保证依赖保持）。
+    \item 或接受 BCNF（消除冗余，牺牲依赖保持）。
+\end{itemize}
+
+\subsection{跨关系检测 FD}
+
+若分解未保持依赖，可用 \textbf{物化视图（Materialized View）} 辅助检查：
+
+\begin{itemize}
+    \item 物化视图定义为 $\alpha\beta$ 上的投影。
+    \item 视图可定义 $\alpha$ 为视图上的候选键。
+    \item 检查 $\alpha \to \beta$ 变成检查 $\alpha$ 是否为视图的候选键，效率更高。
+\end{itemize}
+
+\textbf{代价}：
+
+\begin{itemize}
+    \item 空间代价：需要存储物化视图。
+    \item 时间代价：视图需要及时更新。
+    \item 部分数据库系统不支持视图上的候选键声明。
+\end{itemize}
+

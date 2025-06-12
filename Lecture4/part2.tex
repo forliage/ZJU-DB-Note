@@ -1,0 +1,224 @@
+\section{完整性约束}
+
+完整性约束可防止数据库意外受损，确保对数据库的授权更改不会导致数据一致性丢失。
+
+实体完整性、参照完整性和用户定义的完整性约束
+
+完整性约束是数据库实例(Instance)必须遵循的
+
+单关系上的约束：非空、主键、唯一、检查(P)
+
+\subsection{域约束}
+
+\begin{lstlisting}[style=sqlstyle]
+create domain hourly-wage numeric(5, 2)
+constraint value-test check(value >= 4.00)    
+\end{lstlisting}
+
+子句constraint value-test是可选的；用于指示更新违反了哪个约束。
+
+\subsection{引用完整性}
+
+约束要求：对每一个参照关系$r_2$中的元组$t_2$其外键值$t_2[\alpha]$要么为NULL，要么必须在被参照关系$r_1$的主键集中能够找到对应的值。
+换句话说，外键列的取值必须是被参照表主键列的一个子集。
+
+\noindent\textbf{形式化定义}
+
+设关系$r_1(R_1)$的主键是属性集合$K_1$，关系$r_2(R_2)$的一个属性子集$\alpha\subset R_2$被声明为外键，
+引用$r_1$的主键$K_1$。则引用完整性约束可以形式化地写成:
+$\Pi_{\alpha}(r_2)\subset \Pi_{K_1}(r_1)$
+
+为了保证这一约束在数据修改(INSERT/DELETE/UPDATE)时始终成立，数据库系统必须在对参照表或被参照表进行插入，删除或
+更新曹祖前后分别做如下检查：
+
+1.INSERT:向参照关系$r_2$插入新元组$t_2$时，若其外键列$\alpha$上的值不为NULL，则必须检查该值存在于被参照关系$r_1$中：$t_2[\alpha]\in \Pi_{K_1}(r_1)$
+如果检查失败，插入将被拒绝。
+
+2.DELETE：从被参照关系$r_1$删除一个元组$t_1$时，必须先查看参照关系$r_2$中是否存在引用$t_1$的元组：$\sigma_{\alpha=t_1[K_1]}(r_2)$。若此查询结果非空，则有两种策略：
+禁止删除：直接报错拒绝删除；级联删除；同时删除所有引用该元组的$r_2$中的元组。
+
+3.UPDATE：
+\begin{itemize}
+    \item 更新参照关系$r_2$的外键列：当修改$r_2.\alpha$中的值时，新值必须依然在被参照表$r_1.K_1$中存在，否则更新被拒绝或按”级联更新“策略将被参照行同步修改。
+    \item 更新被参照关系$r_1$的主键列：当修改$r_1.K_1$中的键值时，若不采取特别策略，则会违反外键约束，常见做法是：
+       \begin{itemize}
+          \item 禁止更新：拒绝修改。
+          \item 级联更新：同时将所有参照关系$r_2$中对应的外键值值一并更新。
+          \item 设为NULL:将所有引用的外键列设为NULL。
+          \item 设为默认值：将外键列设为预定义的默认值。
+       \end{itemize}
+\end{itemize}
+
+在SQL DDL中，可以在CREATE TABLE或ALTER TABLE语句中声明外键及其约束行为：
+\begin{lstlisting}[style=sqlstyle]
+CREATE TABLE department (
+    dept_id INT PRIMARY KEY,
+    d_name VARCHAR(50)
+);
+
+CREATE TABLE employee(
+    emp_id INT PRIMARY KEY,
+    emp_name VARCHAR(50),
+    dept_ref INT,
+    -- declare dept_ref as foreign key, refer department(dept_id)
+    FOREIGN KEY (dept_ref)
+        REFERENCES department (dept_id)
+        ON DELETE CASCADE
+        ON UPDATE RESTRICT
+);
+\end{lstlisting}
+
+\subsection{级联}
+
+\begin{lstlisting}[style=sqlstyle]
+Create table account (
+    ... 
+    foreign key (branch-name) references branch
+       [on delete cascade]
+       [on update cascade]
+       ...
+);    
+\end{lstlisting}
+
+由于存在级联删除子句，如果删除branch中的一个元组导致引用完整性约束被违反，那么该删除操作会级联到account关系，
+删除account中引用已删除branch的元组。
+
+如果多个关系之间存在外键依赖链，且每个依赖都指定了级联删除，那么链一端的删除或更新操作可以在整个链中传播。
+
+但是，如果级联更新或删除导致了无法通过进一步级联操作处理的约束冲突，系统将中止该事务。因此，该事务及其级联操作所导致的所有更改都将被撤销。
+
+外键属性中的NULL会使SQL引用完整性语义变得复杂，最好使用非空约束来避免。
+
+\subsection{断言}
+
+定义：断言是一条全局性的谓词，表达了数据库在任何时刻、任何更新之后都必须满足的条件，通常用于对多张关系（表）之间的复杂的约束检查。
+
+CREATE ASSERTION <断言名> CHECK (<布尔表达式>);
+
+检查策略：一旦咋数据库中定义了某个断言，系统就会在每次可能导致该断言失效的INSERT/DELETE/UPDATE操作之后，对断言的CHECK条件做一次完整性检查——如果断言的谓词为真，操作继续；如果断言为假，操作被拒绝并报错。
+
+性能影响：因为每个相关更新都要重新执行一次断言检查，可能涉及对多张表或聚合计算的大量扫描，带来显著的性能开销，所以在生产系统中要慎用。
+
+SQL本身并不提供类似”FOR ALL x,P(x)“地方直接语法，但可以利用逻辑等价式：$\forall x P(x)\equiv \lnot \exists x\lnot P(x)$
+在SQL中就经常写成：
+\begin{lstlisting}[style=sqlstyle]
+CHECK (NOT EXISTS(
+    SELECT * FROM ...
+    WHERE NOT (P(x))
+))    
+\end{lstlisting}
+
+\subsection{触发器}
+
+Trigger是一种由系统自动执行，用以在数据库发生增删改时被动触发的存储过程。它的主要作用是：
+1.在数据修改时自动执行特定操作，完成复杂检查、维护派生数据、记录审计日志、或与外部系统交互等
+2.实现比CHECK约束或断言更灵活的逻辑，可以跨表、多步、带条件地响应数据变化
+
+要设计一个Trigger，必须指定两个核心要素：
+\begin{enumerate}
+    \item 触发条件：
+       \begin{itemize}
+          \item 事件类型：INSERT/DELETE/UPDATE
+          \item 时机：BEFORE/AFTER
+          \item 对于UPDATE，还可以细化为“仅当某个属性被修改时才触发”(AFTER UPDATE OF balance ON account)
+       \end{itemize}
+    \item 触发动作
+       \begin{itemize}
+          \item 一段或多段SQL语句，定义当触发条件满足时要自动执行的操作。
+          \item 可以引用更新前或更新后的行值
+       \end{itemize}
+\end{enumerate}
+
+
+例子：银行透支处理：假设我们希望不允许账户余额为负，但允许客户“透支”：当account.balance更新为负数时，系统自动:
+\begin{enumerate}
+    \item 将该账户余额设为0
+    \item 自动创建一笔与透支金额相等的新贷款(loan)，贷款号与账户号相同
+    \item 并在borrower表中登记该客户的贷款记录
+\end{enumerate}
+
+SQL:1999标准语法
+\begin{lstlisting}[style=sqlstyle]
+CREATE TRIGGER overdraft_trigger
+  AFTER UPDATE ON account
+  REFERENCING NEW ROW AS nrow
+              OLD ROW AS orow
+  FOR EACH ROW
+  WHEN (nrow.balance < 0)
+BEGIN ATOMIC
+  INSERT INTO borrower (customer_name, loan_number)
+    SELECT D.customer_name, nrow.account_number
+      FROM depositor D
+    WHERE D.account_number = nrow.account_number;
+    
+  INSERT INTO loan (loan_number, branch_name, amount)
+    VALUES (nrow.account_number,
+            nrow.branch_name,
+            - nrow.balance);
+
+  UPDATE account
+    SET balance = 0
+  WHERE account_number = nrow.account_number;
+END;
+\end{lstlisting}
+
+触发器的两种粒度：
+\begin{enumerate}
+    \item 行级触发器
+       \begin{itemize}
+          \item 使用FOR EACH ROW或默认行为
+          \item 每次修改一行，就独立触发一次动作
+          \item 适合需要对每行做细粒度处理的场景，但如果一次性更新大量行，可能性能开销大
+       \end{itemize}
+    \item 语句级触发器
+       \begin{itemize}
+          \item 使用FOR EACH STATEMENT
+          \item 对某一条DML语句（即使影响多行）只触发一次
+          \item SQL Server中可用INSERT/UPDATE临时过渡表，或Oracle中的REFERENCING NEW TABLE AS newtab来访问所有受影响行。
+          \item 适合统计汇总、批量维护场景，更高效。
+       \end{itemize}
+\end{enumerate}
+
+
+有时，我们需要在数据库修改后执行外部世界动作，例如：
+\begin{itemize}
+    \item 当库存低于阈值时，自动向供应商下采购单；
+    \item 触发报警系统等
+\end{itemize}
+
+由于数据库的trigger不能直接调用外部系统(出于transaction一致性考虑)，常用做法是：
+\begin{itemize}
+    \item 在trigger中写入"待办动作"表
+    \item 外部守护进程定期扫描该表，执行业务层面的外部动作，并在完成后删除已处理的记录。
+\end{itemize}
+
+例子：补货trigger
+
+\begin{lstlisting}[style=sqlstyle]
+ CREATE TRIGGER recorder_trigger
+   AFTER UPDATE OF level ON inventory
+   REFERENCING OLD ROW AS orow NEW ROW AS nrow
+   FOR EACH ROW
+   WHEN (nrow.level <= (
+        SELECT level
+        FROM minlevel
+        WHERE minlevel.item = nrow.item)
+      AND orow.level > (
+        SELECT level
+        FROM minlevel
+        WHERE minlevel.item = orow.item
+      )
+   )
+BEGIN
+   INSERT INTO orders(item, quatity)
+      SELECT item, amount
+        FROM recorder
+        WHERE recorder.item = orow.item;
+END;        
+\end{lstlisting}
+
+何时不宜使用Trigger:
+\begin{itemize}
+    \item 维护汇总数据、数据库复制等场景，现代数据库提供了物化视图、内置复值机制，比trigger方式更高效
+    \item 大量触发逻辑会导致事务变长、锁等待与性能瓶颈，因此应尽量将复杂业务逻辑放在应用层或专门的批处理/实时流处理系统中。
+\end{itemize}

@@ -1,0 +1,22 @@
+\babel@toc {english}{}\relax 
+\contentsline {section}{\numberline {1}Transaction定义}{2}{section.1}%
+\contentsline {subsection}{\numberline {1.1}概念}{2}{subsection.1.1}%
+\contentsline {section}{\numberline {2}Transaction状态}{2}{section.2}%
+\contentsline {section}{\numberline {3}原子性和持久性的实现}{3}{section.3}%
+\contentsline {section}{\numberline {4}并发执行}{4}{section.4}%
+\contentsline {section}{\numberline {5}可串行化}{5}{section.5}%
+\contentsline {subsection}{\numberline {5.1}可串行化}{5}{subsection.5.1}%
+\contentsline {subsection}{\numberline {5.2}事务的简化视图}{5}{subsection.5.2}%
+\contentsline {subsection}{\numberline {5.3}冲突指令}{6}{subsection.5.3}%
+\contentsline {subsection}{\numberline {5.4}冲突可串行性}{6}{subsection.5.4}%
+\contentsline {section}{\numberline {6}可恢复性}{6}{section.6}%
+\contentsline {subsection}{\numberline {6.1}可恢复调度}{6}{subsection.6.1}%
+\contentsline {subsection}{\numberline {6.2}级联回滚}{6}{subsection.6.2}%
+\contentsline {subsection}{\numberline {6.3}无级联调度}{6}{subsection.6.3}%
+\contentsline {section}{\numberline {7}隔离性的实现}{7}{section.7}%
+\contentsline {section}{\numberline {8}SQL中的事务定义}{7}{section.8}%
+\contentsline {section}{\numberline {9}可串行性测试}{7}{section.9}%
+\contentsline {subsection}{\numberline {9.1}可串行性测试}{7}{subsection.9.1}%
+\contentsline {subsection}{\numberline {9.2}冲突串行性测试}{7}{subsection.9.2}%
+\contentsline {subsection}{\numberline {9.3}并发控制与可串行性测试}{8}{subsection.9.3}%
+\contentsfinish 

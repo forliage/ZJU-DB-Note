@@ -1,0 +1,18 @@
+\section{SQL中的索引定义} 
+
+创建一个索引：
+\begin{lstlisting}[style=sqlstyle]
+create index <index-name> on <table-name>(<attribute-list>);    
+\end{lstlisting}
+
+例如：
+\begin{lstlisting}[style=sqlstyle]
+create index b-index on branch(branch-name);
+create index cust-strt-city-index on customer(customer-city, customer-street);    
+\end{lstlisting}
+
+使用\texttt{create unique index}间接指定并强制要求搜索键为候选键
+
+例如：\texttt{create unique index uni-acnt-index on account(account-number);}。如果支持SQL唯一完整性约束，则并非真正必须。
+
+删除索引：\texttt{drop index <index-name>}

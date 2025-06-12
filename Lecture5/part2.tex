@@ -1,0 +1,62 @@
+\section{关系集}
+
+\subsection{关系和关系集}
+
+1.Relationship:
+\begin{itemize}
+    \item 是两个或多个实体之间的一种关联
+    \item 例如在银行模型中，实体集customer(客户)和实体集loan(贷款)之间存在"借款人"关系:
+\end{itemize}
+
+2.Relationship set:
+\begin{itemize}
+    \item 是同一类关系的全体实例的集合
+    \item 用于ER图中描绘实体集之间的联系
+    \item 例如，定义了一个关系集borrower(customer-name, loan-number)，它包含所有"哪个客户借了哪笔贷款"的元组
+\end{itemize}
+
+\subsection{形式化定义}
+
+假设有$n$个实体集$E_1,E_2,...,E_n$，则一个关系集可以形式地看作：
+$$R\subset E_1\times E_2\times ...\times E_n$$
+其中$(e_1,e_2,...,e_n)\in R$表示实体$e_i\in E_i(i=1...n)$之间存在一次关联(一个关系实例)
+
+\subsection{关系集的属性}
+
+关系属性就像实体的属性一样，用来描述关系本身的特征。
+
+例如\texttt{depositor(customer-name,account-number,access-date)}这个关系集:
+\begin{itemize}
+    \item 它把\texttt{customer}与\texttt{account}关联起来，表示"哪个客户在什么时候访问了哪个账户"
+    \item 其中\texttt{access-date}就是描述这次访问的一个属性
+\end{itemize}
+
+\subsection{关系集的度}
+
+Degree表示一个关系集中参与的实体集数量(即上面定义里$n$的值)
+
+最常见的binary relationship：degree=2，两个实体集之间的联系。
+
+也可以有三元(ternary)或更高元(n-ary)的关系，但在实际建模中较少见。
+
+\subsection{映射基数}
+
+对于二元关系集，通常用映射基数来描述"一个实体最多能和多少个对方实体关联"：
+\begin{enumerate}
+    \item 一对一:一个$A$中的实体最多关联一个$B$中的实体，反之亦然。例如:\texttt{country-president}
+    \item 一对多:一个$A$中的实体可以关联多个$B$中的实体，但每个$B$中的实体仅对应一个$A$。例如:\texttt{department-employee}
+    \item 多对一:对应上面一对多的反向视图：多个$A$对应同一个$B$，且每个$B$最多对应一个$A$。例如:\texttt{patient-doctor}
+    \item 多对多:一个$A$可以与多个$B$关联，同时一个$B$也可与多个$A$关联。例如:\texttt{student-course}
+\end{enumerate}
+
+注意:在E-R图中，通常用在连线上标注 “1”， “N” 或 “M” 来表示各端的映射基数。
+
+\subsection{关系集到关系模式的映射}
+
+在将 ER 模型转换为关系模式时，每个二元关系集可以根据其映射基数不同，选择不同的实现方式：
+
+\begin{enumerate}
+    \item 一对一：可将二者合并为一张表；或在任意一侧添加对方主键作为外键。
+    \item 一对多：在“多”端的关系表中，添加“1”端的主键作为外键。例如\texttt{employee}表中加\texttt{department\_id}列，引用\texttt{department(dept\_id)}
+    \item 多对多：需要拆出一个关联表（交叉表），其主键是两端实体的主键组合。
+\end{enumerate}

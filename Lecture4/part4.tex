@@ -1,0 +1,84 @@
+\section{嵌入式SQL}
+
+Embedded SQL是把SQL语句嵌入到“宿主语言”中的一种标准机制。
+
+为什么要用？
+\begin{itemize}
+    \item SQL功能不完备。例如流程控制、复杂计算、资源管理(文件、网络)等，要在宿主语言里处理更方便。
+    \item 动态参数传递：通过宿主语言变量，可以在运行时构造查询条件并把结果带回程序
+    \item 事务与业务逻辑结合：在同一程序中既能执行业务算法，又能做数据库操作。
+\end{itemize}
+
+1.Pre-processing:嵌入式SQL代码需要先由“预编译器”（如 pro*c、esql、nsqlprep 等）扫描，把所有 EXEC SQL ... END\_EXEC 块中的 SQL 提取出来，生成普通函数调用（OCI、ODBC、CLI、LIBPQ 等），并保留宿主语言变量接口。
+预编译器还会插入头文件（如 \#include <sqlca.h>）、定义 SQL 通讯区 SQLCA，用于保存每条SQL执行后的状态码（如 sqlca.sqlcode/sqlca.sqlerrd）。
+
+2.DECLARE section
+\begin{lstlisting}[style=cppstyle]
+    EXEC SQL BEGIN DECLARE SECTION;
+    char V_an[20], bn[20];
+    float bal;
+  EXEC SQL END DECLARE SECTION;
+\end{lstlisting}
+
+3.Single-Row Query:
+\begin{lstlisting}[style=cppstyle]
+    scanf("%s", V_an); 
+    EXEC SQL
+      SELECT branch_name, balance
+        INTO :bn, :bal
+        FROM account
+       WHERE account_number = :V_an;
+    END_EXEC;      
+\end{lstlisting}
+
+4.Cursor:
+\begin{lstlisting}[style=cppstyle]
+    EXEC SQL
+      DECLARE c CURSOR FOR
+        SELECT B.customer_name, B.customer_city
+          FROM depositor D, customer B, account A
+         WHERE D.customer_name = B.customer_name
+           AND D.account_number = A.account_number
+           AND A.balance > :v_amount;
+    END_EXEC;
+    EXEC SQL OPEN c END_EXEC;
+    while (1) {
+      EXEC SQL FETCH c INTO :cn, :cc END_EXEC;
+      if (sqlca.sqlcode == 100) break; 
+      printf("customer:%s, city:%s\n", cn, cc);
+    }
+    EXEC SQL CLOSE c END_EXEC;
+       
+\end{lstlisting}
+
+5.单行更新:
+\begin{lstlisting}[style=cppstyle]
+    scanf("%f", &delta);
+    EXEC SQL
+      UPDATE account
+         SET balance = balance + :delta
+       WHERE account_number = :V_an;
+    END_EXEC;        
+\end{lstlisting}
+
+6.多行更新:
+\begin{lstlisting}[style=cppstyle]
+    EXEC SQL
+    DECLARE csr CURSOR FOR
+      SELECT * FROM account
+       WHERE branch_name = 'Perryridge'
+       FOR UPDATE OF balance; 
+  END_EXEC;
+  
+  EXEC SQL OPEN csr;
+  while (1) {
+    EXEC SQL FETCH csr INTO :an, :bn, :bal;
+    if (sqlca.sqlcode == 100) break;
+    EXEC SQL
+      UPDATE account
+         SET balance = balance + 100
+       WHERE CURRENT OF csr;
+    END_EXEC;
+  }
+  EXEC SQL CLOSE csr;     
+\end{lstlisting}

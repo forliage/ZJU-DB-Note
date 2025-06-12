@@ -1,0 +1,84 @@
+\section{数据定义语言}
+DDL的主要功能包括：
+\begin{itemize}
+    \item 为每个关系定义模式
+    \item 定义与每个属性相关的值域
+    \item 定义完整性约束
+    \item 定义每个关系在磁盘上的物理存储结构
+    \item 定义每个关系要维护的索引
+    \item 定义关系的视图
+\end{itemize}
+
+\subsection{SQL中的域类型}
+
+\begin{itemize}
+    \item char(n):固定长度字符字符串，长度由用户指定
+    \item varchar(n):可变长度字符字符串，最大长度由用户指定$n$
+    \item int:整数（一个有限的整数子集，依赖于机器）
+    \item smallint:小整数（整数域类型的一个依赖于机器的子集）
+    \item numeric(p,d):定点数，具有用户指定的$p$位精度，小数点右侧有$d$位
+    \item real,double precision:浮点数和双精度浮点数，具有机器相关的精度
+    \item float(n):浮点数，用户指定的精度至少为$n$位
+    \item 所有域类型都允许空值。声明某属性为非空将禁止该属性的空值
+    \item date:日期(4位数字)年份、月份、日期
+    \item Time:一天中的时间，以小时、分钟和秒表示
+    \item timestamp:日期+时间
+\end{itemize}
+
+SQL中有许多函数用于处理各种类型的数据及其类型转换，但各数据库系统中函数的标准化程度不高。
+
+\subsection{创建表}
+
+\begin{lstlisting}[style=sqlstyle]
+CREATE TABLE r(A1D1, A2D2,...,AnDn,
+               (integrity constraint 1),
+               \dots
+               (integrity constraint n))    
+\end{lstlisting}
+
+r是关系名称；每个Ai是关系r模式中的属性名称；Di是属性Ai域中值的数据类型。
+
+\subsection{创建表中的完整性约束}
+
+非空
+
+主键$(A_1,A_2,...,A_n)$
+
+检查(P)，其中P是一个谓词
+
+\subsection{删除和修改表}
+
+删除表命令会从数据库中删除关于被删除关系的所有信息。
+
+\begin{lstlisting}[style=sqlstyle]
+DROP TABLE r    
+\end{lstlisting}
+
+使用删除命令时请小心。
+
+修改表命令用于向现有关系添加属性：
+\begin{lstlisting}[style=sqlstyle]
+ALTER TABLE r ADD A D;
+ALTER TABLE r ADD (A1D1, ..., AnDn);    
+\end{lstlisting}
+其中$A$是要添加到关系$r$的属性名称，$D$是$A$的域。
+
+修改表命令也可以用于删除关系的属性：
+\begin{lstlisting}[style=sqlstyle]
+ALTER TABLE r DROP A    
+\end{lstlisting}
+其中$A$是关系$r$中属性的名称。
+
+注意，许多数据库不支持删除属性。
+
+修改表命令也可以用于修改关系的属性。
+
+\subsection{创建索引}
+
+\begin{lstlisting}[style=sqlstyle]
+ CREATE INDEX <i-name> ON <table-name> (<attribute-list>);
+ 
+ CREATE UNIQUE INDEX <i-name> ON <table-name> (<attribute-list);
+
+ DROP INDEX <i-name>;
+\end{lstlisting}

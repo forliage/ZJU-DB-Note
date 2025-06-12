@@ -1,0 +1,41 @@
+\section{SQL数据类型和模式}
+
+用户定义类型：结构化数据类型
+\begin{lstlisting}[style=sqlstyle]
+Create type person_name as varchar(20)
+
+create table student
+        (sno char(10) primary key,
+        sname person_name,
+        ssex char(1),
+        birthday date)
+drop type person_name
+\end{lstlisting}
+
+创建新域
+\begin{lstlisting}[style=sqlstyle]
+create domain dollars as numeric(12,2) not null;
+create domain pounds as numeric(12,2);
+create table employee
+         (eno char(10) primary key,
+          ename varchar(15),
+          job varchar(10),
+          salary dollars,
+          comm pounds);    
+\end{lstlisting}
+
+大对象（例如照片、视频、CAD文件等）类型:
+\begin{itemize}
+    \item blob:二进制大对象--对象是大量未解释的二进制数据集合（其解释留给数据库系统之外的应用程序）
+    \item clob:字符大对象--对象是大量字符数据集合
+    \item 当查询返回大对象时，返回的是指针而非大对象本身
+\end{itemize}
+
+\begin{lstlisting}[style=sqlstyle]
+create table students
+      (sid char(10) primary key,
+       name varchar(10),
+       gender char(1),
+       photo blob(20MB),
+       cv clob(10KB))    
+\end{lstlisting}

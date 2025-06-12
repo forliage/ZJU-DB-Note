@@ -1,0 +1,66 @@
+\section{将实体-关系模式转换为表}
+
+\subsection{概述}
+
+基本原则：
+\begin{itemize}
+    \item 将 E-R 图 转换为表，是实现 关系数据库设计的关键步骤。
+    \item 一个符合 E-R 图结构的数据库 → 可以用 一组表（collection of tables） 来表示。
+    \item 每一个实体集（entity set）和关系集（relationship set） 都对应一个唯一的表，表名通常与实体集或关系集同名。
+\end{itemize}
+
+\subsection{表示实体集为表}
+
+强实体集（Strong Entity Set）：
+\begin{itemize}
+    \item 直接转换为表，表的属性 = 实体的属性。
+    \item 主键直接作为表的主键。
+\end{itemize}
+
+\subsection{复合属性}
+
+转换规则：
+\begin{itemize}
+    \item 将复合属性拆分成 多个简单属性。
+    \item 每个组成部分作为单独的属性出现在表中。
+\end{itemize}
+
+原则：提取所有“叶子节点”属性放入表中。
+
+\subsection{多值属性}
+
+转换规则：
+\begin{itemize}
+    \item 为每一个多值属性创建单独的表。
+    \item 新表的主键 = 原实体的主键 + 多值属性本身。
+\end{itemize}
+
+\subsection{弱实体集}
+
+转换规则：
+\begin{itemize}
+    \item 弱实体集自身不能独立存在，依赖于强实体集的主键。
+    \item 转换成表时需要包含：自身的属性;强实体集的主键（作为外键）
+\end{itemize}
+
+\subsection{关系集的表示}
+
+转换规则：关系集转为表时，表中应包含：参与关系的实体集的主键（作为外键）。关系集自身的属性（如果有）.
+
+多对一 or 一对多:可以选择在“多”端表中添加一个额外属性，存储“1”端实体的主键。
+
+\subsection{表的冗余}
+
+Total Participation（完全参与）：直接将 "1" 端的主键加到 "多" 端表中作为属性。
+
+Partial Participation（部分参与）：若将主键加到 "多" 端表中，可能导致 null 值 出现。此时是否拆出单独表需根据场景权衡。
+
+关系集与弱实体的冗余：连接弱实体与其标识强实体的关系集 → 通常是冗余的，因为弱实体表中已经包含了强实体的主键。
+
+\subsection{特化/泛化的表示}
+
+方法1：为高层实体集建一个表；为每个低层实体集单独建表，包含高层主键 + 低层特有属性。访问完整信息需联表查询。
+
+
+
+方法2：为每个实体集建立表，包含本地属性 + 继承的属性。若特化是 total，可省略高层表（用 view 替代）。可能出现冗余，尤其是 street、city 出现在多个表中，数据一致性需维护。

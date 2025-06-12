@@ -1,0 +1,43 @@
+\babel@toc {english}{}\relax 
+\contentsline {section}{\numberline {1}实体集}{3}{section.1}%
+\contentsline {subsection}{\numberline {1.1}实体和实体集}{3}{subsection.1.1}%
+\contentsline {subsection}{\numberline {1.2}属性与域}{3}{subsection.1.2}%
+\contentsline {subsection}{\numberline {1.3}属性类型}{3}{subsection.1.3}%
+\contentsline {subsection}{\numberline {1.4}实体集和关系模型}{4}{subsection.1.4}%
+\contentsline {section}{\numberline {2}关系集}{4}{section.2}%
+\contentsline {subsection}{\numberline {2.1}关系和关系集}{4}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}形式化定义}{5}{subsection.2.2}%
+\contentsline {subsection}{\numberline {2.3}关系集的属性}{5}{subsection.2.3}%
+\contentsline {subsection}{\numberline {2.4}关系集的度}{5}{subsection.2.4}%
+\contentsline {subsection}{\numberline {2.5}映射基数}{5}{subsection.2.5}%
+\contentsline {subsection}{\numberline {2.6}关系集到关系模式的映射}{5}{subsection.2.6}%
+\contentsline {section}{\numberline {3}键}{6}{section.3}%
+\contentsline {subsection}{\numberline {3.1}实体集的键}{6}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}关系集的键}{6}{subsection.3.2}%
+\contentsline {subsection}{\numberline {3.3}映射基数对键的影响}{7}{subsection.3.3}%
+\contentsline {section}{\numberline {4}实体-关系图}{7}{section.4}%
+\contentsline {section}{\numberline {5}弱实体集}{8}{section.5}%
+\contentsline {subsection}{\numberline {5.1}什么是弱实体集}{8}{subsection.5.1}%
+\contentsline {subsection}{\numberline {5.2}弱实体集的要素}{8}{subsection.5.2}%
+\contentsline {subsection}{\numberline {5.3}转换到关系模式}{9}{subsection.5.3}%
+\contentsline {section}{\numberline {6}扩展实体-关系特征}{10}{section.6}%
+\contentsline {subsection}{\numberline {6.1}概述}{10}{subsection.6.1}%
+\contentsline {subsection}{\numberline {6.2}实体集的分层}{10}{subsection.6.2}%
+\contentsline {subsubsection}{\numberline {6.2.1}特化、具体化}{10}{subsubsection.6.2.1}%
+\contentsline {subsubsection}{\numberline {6.2.2}泛化、普遍化}{10}{subsubsection.6.2.2}%
+\contentsline {subsubsection}{\numberline {6.2.3}特化/泛化设计约束}{10}{subsubsection.6.2.3}%
+\contentsline {subsection}{\numberline {6.3}聚集}{11}{subsection.6.3}%
+\contentsline {section}{\numberline {7}实体-关系模式数据库设计}{11}{section.7}%
+\contentsline {subsection}{\numberline {7.1}E-R 数据库模式设计流程}{11}{subsection.7.1}%
+\contentsline {subsection}{\numberline {7.2}E-R 设计决策}{12}{subsection.7.2}%
+\contentsline {subsection}{\numberline {7.3}其它 E-R 设计决策}{13}{subsection.7.3}%
+\contentsline {section}{\numberline {8}将实体-关系模式转换为表}{13}{section.8}%
+\contentsline {subsection}{\numberline {8.1}概述}{13}{subsection.8.1}%
+\contentsline {subsection}{\numberline {8.2}表示实体集为表}{14}{subsection.8.2}%
+\contentsline {subsection}{\numberline {8.3}复合属性}{14}{subsection.8.3}%
+\contentsline {subsection}{\numberline {8.4}多值属性}{14}{subsection.8.4}%
+\contentsline {subsection}{\numberline {8.5}弱实体集}{14}{subsection.8.5}%
+\contentsline {subsection}{\numberline {8.6}关系集的表示}{14}{subsection.8.6}%
+\contentsline {subsection}{\numberline {8.7}表的冗余}{14}{subsection.8.7}%
+\contentsline {subsection}{\numberline {8.8}特化/泛化的表示}{15}{subsection.8.8}%
+\contentsfinish 

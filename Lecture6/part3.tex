@@ -1,0 +1,90 @@
+\section{函数依赖}
+
+\subsection{什么是函数依赖}
+
+函数依赖(FD)是一种完整性约束，用于描述关系中属性之间的值的依赖关系。
+
+数学上的类比是$x\to f(x)$，意味着一个属性组$\alpha$的值可以唯一决定另一个属性组$\beta$的值，记作:$\alpha\to\beta$
+
+定义：若对于关系$R$中任意两个元组$t_1,t_2$。若$t_1[\alpha]=t_2[\alpha]$，则$t_1[\beta]=t_2[\beta]$，
+则称$\alpha\to\beta$在$R$上成立。
+
+例子：
+贷款信息表:F=\{loan-number$\to$amount,loan-number$\to$branch-name,(customer-name,loan-number)$\to$amount,(customer-name,loan-number)$\to$branch-name\}
+不希望出现loan-number$\to$cutomer-name 
+
+\subsection{函数依赖与键的关系}
+
+键是函数依赖的一种特殊形式
+
+超键：$K$是$R$的超键$\leftrightarrow K\to R$
+
+候选键：$K\to R$，且$K$没有真子集$\alpha$使得$\alpha\to R$
+
+函数依赖比键更一般，可以表达键无法表达的约束。
+
+\subsection{函数依赖的作用}
+
+1.验证关系是否满足约束：给定关系$r$和函数依赖集$F$，若$r$满足$F$，则称$r$满足$F$
+
+2.规范化设计模式：
+\begin{itemize}
+    \item 判断模式的规范化程度，帮助消除冗余、提高设计质量。
+    \item 可以推导出哪些属性组是否应该归属于同一张表。
+\end{itemize}
+
+\subsection{平凡与非平凡依赖}
+
+平凡依赖：$\alpha\to\beta$若$\beta\subseteq \alpha$
+
+非平凡依赖：$\alpha\to\beta$且$\beta\nsubseteq\alpha$
+
+\subsection{函数依赖集的闭包$F^+$}
+
+闭包是指：由$F$推导出的所有可能成立的函数依赖集合。
+
+\subsection{Armstrong公理}
+
+计算闭包的基本推导规则：
+\begin{enumerate}
+    \item 自反律：$\beta\subseteq\alpha\Longrightarrow\alpha\to\beta$
+    \item 增补律：$\alpha\to\beta\Longrightarrow\gamma\alpha\to\gamma\beta$
+    \item 传递律：$\alpha\to\beta$且$\beta\to\gamma\Longrightarrow\alpha\to\gamma$
+\end{enumerate}
+
+补充规则：
+\begin{itemize}
+    \item 合并律：$\alpha\to\beta$且$\alpha\to\gamma\Longrightarrow\alpha\to\beta\gamma$
+    \item 分解律：$\alpha\to\beta\gamma\Longrightarrow\alpha\to\beta$且$\alpha\to\gamma$
+    \item 伪传递律：$\alpha\to\beta$且$\gamma\beta\to\delta\Longrightarrow\alpha\gamma\to\delta$
+\end{itemize}
+
+\subsection{属性集闭包$\alpha^+$}
+
+属性集闭包$\alpha^+$是指由$\alpha$函数决定的所有属性集合
+
+用途：
+\begin{itemize}
+    \item 判断$\alpha$是否是SuperKey(若$\alpha^+=R$)
+    \item 判断$\alpha\to\beta$是否在$F^+$中成立(是否$\beta\subseteq\alpha^+$)
+\end{itemize}
+
+\subsection{正则覆盖}
+
+目的：压缩函数依赖集，减少检查代价。
+
+特点：最小的等价函数依赖集，去除冗余依赖和无关属性。
+
+三种冗余情况：
+\begin{enumerate}
+    \item 整个 FD 冗余$\to$可由其他依赖推出。
+    \item 左边属性冗余。
+    \item 右边属性冗余。
+\end{enumerate}
+
+计算过程：反复：
+\begin{itemize}
+    \item 应用合并律。
+    \item 找出无关属性，删除。
+    \item 直到 F 不再变化。
+\end{itemize}

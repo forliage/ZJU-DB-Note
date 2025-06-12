@@ -1,0 +1,88 @@
+\section{实体-关系模式数据库设计}
+
+\subsection{E-R 数据库模式设计流程}
+
+(1)需求分析（Requirement analysis）
+\begin{itemize}
+    \item 目的：明确系统需要处理哪些数据、支持哪些应用程序、完成哪些操作。
+    \item 产出：系统需求文档，作为后续设计的依据。
+\end{itemize}
+
+(2)概念数据库设计（Conceptual database design）
+\begin{itemize}
+    \item 使用 E-R 模型（或类似的高层数据模型）描述数据和约束。
+    \item 目的是提供一个高层次的抽象描述，让业务人员、开发人员都能理解数据库结构。
+\end{itemize}
+
+(3)逻辑数据库设计（Logical database design）
+\begin{itemize}
+    \item 将概念设计转化为逻辑数据库模式，即表（tables）。
+    \item 包括模式优化：关系规范化（Normalization），消除冗余和异常，确保数据一致性和高效性。
+\end{itemize}
+
+(4)物理数据库设计（Physical database design）
+\begin{itemize}
+    \item 涉及索引（Indexing）、聚簇（clustering）、数据库调优（database tuning）。
+    \item 目标是优化数据库的性能，提升查询和事务处理速度。
+\end{itemize}
+
+\subsection{E-R 设计决策}
+
+(1)用属性（attribute）还是实体集（entity set）表示对象？
+
+决策依据：
+\begin{itemize}
+    \item 如果对象只有简单的名字或单值特性 ,可用属性。
+    \item 如果对象本身有多个属性需要描述 , 应定义为实体集。
+\end{itemize}
+
+电话（phone）可以作为属性存储在 employee 中，但如果需要记录多个电话和电话的其他信息（位置、类型、颜色），则应定义 phone 为独立实体集。
+
+设计原则：
+\begin{itemize}
+    \item 一个对象不能同时作为实体和属性。
+    \item 实体集之间才能建立联系，属性不能单独与实体集建立联系。
+\end{itemize}
+
+(2)用实体集（entity set）还是关系集（relationship set）表示？
+
+决策依据：
+\begin{itemize}
+    \item 如果要描述两个实体之间发生的“动作” , 用关系集。
+    \item 如果描述的是对象本身 , 用实体集。
+\end{itemize}
+
+“借款人（borrower）” 是客户和贷款之间的关系，建模为关系集。“贷款（loan）” 是一个独立实体，建模为实体集。
+
+设计影响因素：
+\begin{itemize}
+    \item 关系的映射基数（mapping cardinality）会影响建模方式。
+    \item 关系集的设计有助于更清晰表达实体之间的交互行为。
+\end{itemize}
+
+(3)用实体的属性（attribute of an entity）还是关系（relationship）表示？
+
+决策依据:需要从对象的独立性和减少数据冗余角度权衡。
+
+在 student 表中直接存 supervisor-id、supervisor-name 等 supervisor 信息，会导致冗余。
+更合理的设计是将 supervisor 定义为单独实体集，student 和 supervisor 之间通过关系（如 stu-sup）联系。
+
+对于语义上独立的对象，应建模为实体集。关系集能更灵活表达动态变化的关联关系。
+
+\subsection{其它 E-R 设计决策}
+
+(4)使用三元或 n 元关系（ternary or n-ary relationship）还是一对二元关系（binary relationships）
+
+如果三个或多个实体之间存在统一的语义关系,n元关系;若可拆解成多个二元关系且含义明确 ,二元关系
+
+(5)使用强实体集（strong entity set）还是弱实体集（weak entity set）
+
+如果实体有自己独立的主键,强实体集。如果实体必须依赖于另一个实体，且没有完全主键,弱实体集。
+
+(6)使用特化/泛化（specialization/generalization）
+
+有助于模块化设计，提高模型的灵活性和扩展性;通过特化/泛化机制，可以清晰表达实体之间的继承关系
+
+(7)使用聚集（aggregation）
+
+将 E-R 图的一部分组合成一个单独实体集，作为一个单元处理;便于处理关系之间的关系，提高设计的抽象层次

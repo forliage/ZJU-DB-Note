@@ -1,0 +1,15 @@
+\babel@toc {english}{}\relax 
+\contentsline {section}{\numberline {1}故障分类}{2}{section.1}%
+\contentsline {subsection}{\numberline {1.1}故障分类}{2}{subsection.1.1}%
+\contentsline {subsection}{\numberline {1.2}恢复算法}{2}{subsection.1.2}%
+\contentsline {section}{\numberline {2}基于日志的恢复}{2}{section.2}%
+\contentsline {subsection}{\numberline {2.1}基于日志的恢复}{2}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}延迟数据库修改}{3}{subsection.2.2}%
+\contentsline {subsection}{\numberline {2.3}即时数据库修改}{3}{subsection.2.3}%
+\contentsline {subsection}{\numberline {2.4}检查点}{4}{subsection.2.4}%
+\contentsline {section}{\numberline {3}并发事务恢复}{4}{section.3}%
+\contentsline {section}{\numberline {4}缓冲区管理}{5}{section.4}%
+\contentsline {subsection}{\numberline {4.1}日志记录缓冲}{5}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}数据库缓冲}{6}{subsection.4.2}%
+\contentsline {section}{\numberline {5}非易失性存储丢失故障}{7}{section.5}%
+\contentsfinish 

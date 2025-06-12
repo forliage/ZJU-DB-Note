@@ -1,0 +1,58 @@
+\section{Boyce-Codd范式}
+
+\subsection{BCNF定义}
+
+定义：关系模式$R$满足BCNF，针对一个函数依赖集$F$，如果对于$F^+$中的所有函数依赖$\alpha\to\beta$，
+都满足以下两个条件之一：
+\begin{enumerate}
+    \item $\alpha\to\beta$是平凡依赖(即$\beta\subseteq\alpha$)
+    \item $\alpha$是$R$的superkey，即$R\subseteq\alpha^+$或$\alpha\to R$
+\end{enumerate}
+
+BCNF 更严格，要求所有的非平凡依赖，左边必须是超码，否则视为违反 BCNF。
+
+\subsection{如何测试BCNF}
+
+判断流程：
+对于每一个$\alpha\to\beta$:
+\begin{enumerate}
+    \item 计算$\alpha^+$(属性闭包)
+    \item 判断$\alpha^+$是否包含所有$R$中的属性。若是，$\alpha^+$是superkey；否则违反BCNF
+\end{enumerate}
+
+简化测试：
+\begin{itemize}
+    \item 通常只需检查$F$中的依赖是否违反BCNF
+    \item 如果$F$中的都合法，则$F^+$中也不会违反BCNF
+\end{itemize}
+
+注意：检查 分解后的子关系 时，必须对$F^+$来判断是否满足 BCNF，而不能只看$F$
+
+\subsection{BCNF分解算法}
+
+\begin{lstlisting}[style=cppstyle]
+result := {R}
+done := false
+compute F^+
+while (not done) do 
+    if exists any Ri not satisfy BCNF:
+        choose a non-trivial dependence a\to b:
+            a is not superkey
+        split Ri as:
+            R1 := (a,b)
+            R2 := Ri - b
+        update result
+    else
+        done := true   
+\end{lstlisting}
+
+最终 result 中所有子模式都是 BCNF，且分解是 无损连接。
+
+\subsection{BCNF 与依赖保持}
+
+BCNF 分解不一定能保持依赖！
+
+例子：$R=(J,K,L),F=\{JK\to L,L\to K\}$。候选键：JK,JL，R不满足BCNF。任意分解都会破坏$JK\to L$的保持性。
+
+Lossless join，BCNF和dependency preservation三者不可兼得。所以实践中有时会使用 3NF 替代 BCNF，因为 3NF 可以保证依赖保持。
+

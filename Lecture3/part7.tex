@@ -1,0 +1,17 @@
+\section{视图}
+
+提供了一种机制，以隐藏某些数据，使特定用户无法查看。
+
+\begin{lstlisting}[style=sqlstyle]
+CREATE VIEW <v_name> AS 
+    SELECT c1,c2,... From ...
+CREATE VIEW <v_name> (c1,c2,...) AS 
+    SELECT e1,e2,...From\dots   
+\end{lstlisting}
+
+好处：安全、易于使用，支持逻辑独立
+
+删除视图：
+\begin{lstlisting}[style=sqlstyle]
+DROP VIEW <V_NAME>    
+\end{lstlisting}

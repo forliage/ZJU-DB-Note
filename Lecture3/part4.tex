@@ -1,0 +1,38 @@
+\section{聚合函数}
+\begin{itemize}
+    \item avg(col):平均值
+    \item min(col):最小值
+    \item max(col):最大值
+    \item sum(col):值的总和
+    \item count(col):值的数量
+\end{itemize}
+
+HAVING子句
+\begin{lstlisting}[style=sqlstyle]
+branch(branch-name,branch-city,assets)
+account(account-number,branch-name,balance)
+
+SELECT A.branch_name,avg(balance)
+FROM account A, branch B
+WHERE A.branch_name = B.branch_name and 
+      branch_city = 'Brooklyn'
+GROUP BY A.branch_name
+HAVING avg(balance) > 1200
+\end{lstlisting}
+
+SELECT语句的形式：
+\begin{lstlisting}[style=sqlstyle]
+SELECT <[DISTINCT] c1,c2,...>
+FROM <r1,...>
+[WHERE <condition>]
+[GROUP BY <c1,c2,...>[HAVING <cond2>]]
+[ORDER BY <c1 [DESC][c2 [DESC|ASC],...]>]    
+\end{lstlisting}
+
+SELECT执行顺序：
+
+from$\to$where$\to$group(aggregate)$\to$having$\to$select$\to$distinct$\to$order by
+
+注意：having子句中的谓词在形成组之后应用，而where子句中的谓词在形成组之前应用。
+
+聚合函数不能直接在where子句中使用。

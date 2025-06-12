@@ -1,0 +1,63 @@
+\section{分解}
+
+\subsection{分解的目标}
+
+分解的目的是：
+\begin{itemize}
+    \item 判断某个关系$R$是否处于 “好” 的形式（Good form）：
+       \begin{itemize}
+          \item 无冗余存储
+          \item 无插入/删除/更新异常
+       \end{itemize}
+    \item 如果关系$R$不是 Good form，则分解为一组关系：$\{R_1,R_2,...,R_n\}$
+\end{itemize}
+
+需要满足以下条件：
+\begin{enumerate}
+    \item 无损连接分解（Lossless-join decomposition，必须保证）
+    \item 依赖保持（Dependency preservation，尽量保证）
+    \item 每个子关系$R_i$处于 Good form —— BCNF 或 3NF（优先满足）。
+\end{enumerate}
+
+\subsection{分解的良好性质}
+
+\noindent\textbf{1.属性完整性}
+
+分解后，所有原始属性必须包含在子关系中：$R=R_1\cup R_2$
+
+\noindent\textbf{2.无损连接分解}
+
+定义：对任意在$R$上的关系$r$，分解后通过自然连接$\Join$操作应当能恢复原始关系：$r=\pi_{R_1}(r)\Join\pi_{R_2}(r)$
+
+判定条件(适用于两表分解)：$R_1\cap R_2\neq\phi$，且必须满足:$(R_1\cap R_2)\to R_1\quad \text{or}\quad (R_1\cap R_2)\to R_2$
+
+直观理解：两个子模式的公共属性如果是某一子关系的候选键，则保证无损连接。保证信息不丢失（lossless），这是分解时的强制性条件，必须满足。
+
+\noindent\textbf{3.依赖保持}
+
+定义：分解后，原有的函数依赖集 F，应尽量能在分解后的子关系$R_i$中直接检验，不需要回到全局 JOIN 后验证。
+这样可以避免在更新操作时，必须JOIN才能验证FD约束，提升效率。
+
+具体做法：
+\begin{itemize}
+    \item 对$F$中的每个依赖$\alpha\to\beta$，希望存在某个$R_i$包含$\alpha\cup\beta$，使得可以直接在$R_i$内部验证。
+    \item 理想状态：$(F_1\cup F_2\cup...\cup F_n)^+=F^+$
+    \item 注：如果依赖保持不满足，不是非法，但会影响更新代价。
+\end{itemize}
+
+\begin{lstlisting}[style=cppstyle]
+result := a
+while result change:
+    for each Ri:
+        t := (recult \cap Ri)^+ \cap Ri 
+        result := result \cup t
+if result contains b, then a\to b is keeping    
+\end{lstlisting}
+
+若 F 中所有依赖都通过上述方式被保持，说明该分解是 dependency preserving。
+
+\noindent\textbf{4.无冗余}
+
+希望分解后子关系处于BCNF 或 3NF，进一步减少冗余和异常。
+
+一般来说，BCNF 保证最严格，但有时为了保持依赖，退而求其次用 3NF。

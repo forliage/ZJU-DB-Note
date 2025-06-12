@@ -1,0 +1,41 @@
+\section{关系数据库设计中的陷阱}
+
+\subsection{概述}
+
+设计目标：找到一组“好”的关系模式（relation schemas），以保证数据的存储和操作的质量。
+
+坏设计（Bad design）会导致：
+\begin{itemize}
+    \item 冗余存储
+    \item 插入/删除/更新异常
+    \item 信息丢失或难以表达
+\end{itemize}
+
+示例:关系模式 Lending-schema：(branch-name, branch-city, assets, customer-name, loan-number, amount)
+该模式中混合了分支信息 + 客户信息 + 贷款信息，设计上存在冗余和异常风险。
+
+\subsection{分解}
+
+主精炼技术（refinement technique）：将一个大表（如 ABCD）拆分成多个子表：(AB), (BCD) 或 (ACD), (ABD) 等。
+
+分解的要求：
+\begin{itemize}
+    \item 所有原始属性必须出现在分解后的表中，即$R=R_1\cup R_2$
+    \item 无损连接分解（Lossless-join decomposition）：任意$r$(在$R$上的关系),应有：$r=\pi_{R_1}(r)\Join \pi_{R_2}(r)$
+\end{itemize}
+
+\subsection{设计目标和理论基础}
+
+目标：
+\begin{itemize}
+    \item 判断一个关系 R 是否是“好”的形式（Good form）：无冗余（No redundant）。
+    \item 若 R 不是 good form，需将其分解为：$\{R_1,R_2,...,R_n\}$
+       使得:每个子关系都在 good form。
+       整体分解是 无损连接分解（Lossless-join decomposition）。
+\end{itemize}
+
+理论依据：
+\begin{itemize}
+    \item 函数依赖:决定属性之间的约束关系。
+    \item 多值依赖:处理属性取多值时的依赖关系。
+\end{itemize}

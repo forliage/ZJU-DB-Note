@@ -1,0 +1,68 @@
+\section{附加关系代数操作}
+
+四种基本符号：Set intersection, Natural Join, Division, Assignment
+
+我们定义了额外的操作，这些操作并不增加关系代数的能力，但简化了常见查询。
+
+\subsection{集合交集操作形式化}
+
+符号：$r\cap s$
+
+定义为：$r\cap s=\{t|t\in r\quad \text{and} t\in s\}$
+
+假设：$r$和$s$具有相同的元数；属性兼容。
+
+$r\cap s=r-(r-s)$
+
+\subsection{自然连接操作的形式化}
+
+符号：$r\Join s$
+
+设$r$和$s$分别是模式$R$和$S$上的关系。那么，$r\Join s$是在模式$R\cup S$上获得的关系，
+考虑每对元组来自$r$的$t_r$和来自$s$的$t_s$；如果$t_r$和$t_s$在$R\cap S$的每个属性上具有相同的值，
+则将元组$t$添加到结果中，其中$t$在$r$上与$t_r$具有相同的值；$t$在$s$上与$t_s$具有相同的值。
+
+注意：
+\begin{enumerate}
+    \item $r,s$必须含有共同属性（名称和域都对应相同）
+    \item 连接两个关系中同名属性值相等的元组
+    \item 结果属性是两个属性集的并集，但消去重名属性
+\end{enumerate}
+
+\subsection{$\theta$连接操作的形式化}
+
+符号：$r\Join_{\theta}s$。其中$\theta$是模式中属性的谓词。
+
+$\theta$连接：$r\Join_{\theta}s=\sigma_{\theta}(r\Join s)$
+
+\subsection{除法运算}
+
+适合所有包含"for all"的语句。
+
+实际上，它确定了一个集合是否包含另一个集合。
+
+符号：$r\div s$
+
+设$r$和$s$分别是模式$R$和$S$上的关系，$R=(A_1,...,A_m,B_1,...,B_n)$和$S=(B_1,...,B_n)$。那么，
+$r\div s$的结果是模式$R-S=(A_1,...,A_m)$上的一个关系
+$$r\div s=\{t|t\in \Pi_{R-S}(r)\land \forall u\in S(tu\in r)\}$$
+
+注意$\Pi_{R-S}(r)$包含了$r\div s$的结果，同时，元组$t$的并集与$s$中的所有元组被$r$覆盖（即，
+商来自于$\Pi_{R-S}(r)$，并且其元组$t$与$s$所有元组的拼接被$r$覆盖）
+
+属性/特性：设$q=r\div s$则$q$是满足$q\times s\subset r$的最大关系。
+
+基本代数运算的定义：设$r(R)$和$s(S)$为关系，且设$S\subset R$，则$$r\div s=\Pi_{R-S}(r)-\Pi_{R-S}\left(\left(\Pi_{R-S}(r)\times s\right)-\Pi_{R-S,S}(r)\right)$$
+
+\subsection{赋值操作}
+
+$\gets$提供了一种方便的方式来表达复杂查询。
+
+将查询写成一个由以下组成的顺序程序：一系列赋值；后面跟着一个表达式，其值作为查询的结果显式。
+
+赋值必须始终在临时关系变量中进行
+
+在$\gets$右侧的结果被赋值给左侧的关系变量。
+
+可以在后续表达式中使用变量。
+
